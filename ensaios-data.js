@@ -28,7 +28,7 @@ window.ENSAIOS = {
       shutter: "1/320 – 1/500s",
       flash: "Luz natural (golden hour)",
       local: "Belo Horizonte — MG",
-      ano: "2025",
+      ano: "2026",
     },
     gallery: [
       "img/ambar_10.jpeg","img/ambar_6.jpeg","img/ambar_3.jpeg","img/ambar_12.jpeg",
@@ -63,7 +63,7 @@ window.ENSAIOS = {
       shutter: "1/320 – 1/500s",
       flash: "Luz natural",
       local: "Belo Horizonte — MG",
-      ano: "2025",
+      ano: "2026",
     },
     gallery: [
       "img/basq_3.jpeg","img/basq_1.jpeg","img/basq_6.jpeg",
@@ -94,7 +94,7 @@ window.ENSAIOS = {
       shutter: "1/320 – 1/500s",
       flash: "Speedlite direto",
       local: "Belo Horizonte — MG",
-      ano: "2025",
+      ano: "2026",
     },
     gallery: [
       "img/IMG_2773.jpeg","img/IMG_2775.jpeg","img/IMG_2777.jpeg",
