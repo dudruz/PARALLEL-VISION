@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <title>Ensaio — PARALLEL VISION</title>
+    <meta name="description" content="Ensaio fotográfico da Parallel Vision — fotografia urbana de rua em Belo Horizonte." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="ensaio.css" />
+  </head>
+  <body class="ensaio-page">
+    <!-- GLOBAL OVERLAYS -->
+    <div class="grain-overlay"></div>
+    <div class="warm-wash"></div>
+    <div class="vignette"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- NAV -->
+    <header class="nav">
+      <a class="brand" href="index.html">PARALLEL<span class="slash">/</span>VISION</a>
+      <a class="back-link" href="index.html#stories">
+        <span class="back-arrow">←</span> Voltar
+      </a>
+    </header>
+
+    <main id="ensaioRoot">
+      <!-- conteúdo injetado por ensaio.js -->
+      <div class="ensaio-loading">Carregando ensaio…</div>
+    </main>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+      <button class="close" id="lbClose">Fechar ✕</button>
+      <button class="arrow prev" id="lbPrev">←</button>
+      <div class="stage">
+        <img id="lbImg" src="" alt="" />
+      </div>
+      <button class="arrow next" id="lbNext">→</button>
+    </div>
+
+    <footer class="ensaio-footer">
+      <a class="ensaio-cta" href="index.html#contact">
+        Curtiu? <span class="accent">Bora criar o seu →</span>
+      </a>
+      <div class="footer-word">PARALLEL VISION</div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.6/dist/lenis.min.js"></script>
+    <script src="ensaios-data.js"></script>
+    <script src="ensaio.js"></script>
+  </body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <title>PARALLEL VISION — Fotografia Urbana / Cultura / Movimento</title>
+    <meta
+      name="description"
+      content="Parallel Vision — fotografia urbana cinematográfica, cultura hip-hop e imagem editorial de rua. Capturando movimento, identidade e atmosfera."
+    />
+    <meta name="keywords" content="fotografia urbana, hip hop, fotografia de rua, editorial, cinematográfico, Parallel Vision, Belo Horizonte" />
+    <meta property="og:title" content="PARALLEL VISION" />
+    <meta property="og:description" content="Fotografia urbana cinematográfica e cultura hip-hop. Movimento, identidade, atmosfera." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- GLOBAL OVERLAYS -->
+    <div class="grain-overlay"></div>
+    <div class="warm-wash"></div>
+    <div class="vignette"></div>
+    <div class="camera-flash"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- LOADER -->
+    <div id="loader" class="scanlines">
+      <h1>PARALLEL<span class="dot">.</span></h1>
+      <div class="loader-bar">
+        <div class="loader-track"><div class="loader-fill"></div></div>
+        <span class="loader-pct">0</span>
+      </div>
+      <p class="loader-sub">Carregando a visão</p>
+    </div>
+
+    <!-- NAV -->
+    <header class="nav">
+      <button class="brand" data-scroll="#hero">
+        PARALLEL<span class="slash">/</span>VISION
+      </button>
+      <button class="menu-toggle" id="menuToggle">
+        <span class="mt-label">Menu</span>
+        <span class="burger"><span></span><span></span></span>
+      </button>
+    </header>
+
+    <nav id="overlay-menu" class="scanlines">
+      <button class="menu-link" data-scroll="#works">
+        <span class="idx">01</span>Trabalhos
+      </button>
+      <button class="menu-link" data-scroll="#stories">
+        <span class="idx">02</span>Ensaios
+      </button>
+      <button class="menu-link" data-scroll="#about">
+        <span class="idx">03</span>Sobre
+      </button>
+      <button class="menu-link" data-scroll="#contact">
+        <span class="idx">04</span>Contato
+      </button>
+      <div class="menu-socials">
+        <span>Instagram</span><span>WhatsApp</span><span>E-mail</span>
+      </div>
+    </nav>
+
+    <main>
+      <!-- HERO -->
+      <section id="hero" class="scanlines">
+        <div class="hero-bg" id="heroBg">
+          <div class="hero-slide active" style="background-image:url('img/IMG_3121.jpeg')"></div>
+          <div class="hero-slide" style="background-image:url('img/IMG_2773.jpeg')"></div>
+          <div class="hero-slide" style="background-image:url('img/IMG_2777.jpeg')"></div>
+          <div class="hero-slide" style="background-image:url('img/IMG_2692.jpeg')"></div>
+          <div class="hero-slide" style="background-image:url('img/IMG_2759.jpeg')"></div>
+          <div class="hero-grad"></div>
+          <div class="hero-grad warm"></div>
+        </div>
+
+        <div class="hero-content" id="heroContent">
+          <p class="hero-eyebrow">Fotografia de Rua · Belo Horizonte</p>
+          <h1 class="hero-title">
+            <span class="line-mask"><span class="line-inner line1 glitch-strong" data-text="PARALLEL">PARALLEL</span></span>
+            <span class="line-mask"><span class="line-inner line2 glitch-strong text-stroke" data-text="VISION">VISION</span></span>
+          </h1>
+          <p class="hero-sub">fotografia urbana • cultura • movimento • perspectiva</p>
+          <div class="hero-btns">
+            <button class="btn btn-primary" data-scroll="#works"><span>Entrar</span></button>
+            <button class="btn" data-scroll="#works">Ver Trabalhos</button>
+            <button class="btn" data-scroll="#contact">Contato</button>
+          </div>
+        </div>
+
+        <div class="scroll-ind"><i></i></div>
+        <div class="hero-count"><span id="heroIdx">01</span> <span class="tot">/ 05</span></div>
+      </section>
+
+      <!-- WORKS -->
+      <section id="works" class="section">
+        <div class="sec-head">
+          <div class="left"><span class="idx">01</span><h2>TRABALHOS</h2></div>
+          <span class="cap">frames selecionados</span>
+        </div>
+        <div class="works-grid" id="worksGrid"><!-- injected by JS --></div>
+      </section>
+
+      <!-- STORIES -->
+      <section id="stories" class="section">
+        <div class="sec-head">
+          <div class="left"><span class="idx">02</span><h2>ENSAIOS</h2></div>
+          <span class="cap">séries / capítulos</span>
+        </div>
+        <div class="stories-wrap" id="storiesWrap"><!-- injected by JS --></div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="section">
+        <div class="about-media scanlines reveal">
+          <img src="img/Donos.jpeg" alt="Miguel (Japa) e Arthur (Gelado) — Parallel Vision" loading="lazy" />
+          <div class="grad"></div>
+          <span class="cap">Japa &amp; Gelado — a dupla</span>
+        </div>
+        <div class="about-body">
+          <p class="about-eyebrow">/ Sobre — 03</p>
+          <h2 class="about-head">
+            <span class="line-mask"><span class="line-inner">CAPTURANDO MOVIMENTO,</span></span>
+            <span class="line-mask"><span class="line-inner">IDENTIDADE E ATMOSFERA</span></span>
+            <span class="line-mask"><span class="line-inner">ATRAVÉS DA</span></span>
+            <span class="line-mask"><span class="line-inner accent">CULTURA URBANA.</span></span>
+          </h2>
+          <p class="about-text">
+            A Parallel Vision nasce do encontro de dois olhares:
+            <strong>Miguel, o Japa</strong>, e <strong>Arthur, o Gelado</strong>.
+            Em vez de estúdio e luz montada, escolhemos a cidade como
+            cenário — a rua, o lugar que tem a ver com a sua história.
+            Cada ensaio é construído no movimento real: luz de fim de tarde,
+            flash direto e a textura da cultura urbana. O resultado é uma imagem
+            quente, autêntica e impossível de repetir.
+          </p>
+          <div class="about-stats">
+            <div><p class="n">02</p><p class="l">Fotógrafos</p></div>
+            <div><p class="n">BH</p><p class="l">e onde rolar</p></div>
+            <div><p class="n">100%</p><p class="l">Na locação</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section scanlines">
+        <p class="contact-eyebrow">/ Contato — 04</p>
+        <h2 class="cta">
+          BORA CRIAR <span class="text-stroke">ALGO</span>
+          <span class="accent">ICÔNICO.</span>
+        </h2>
+        <div class="contact-grid">
+          <div class="socials-col">
+            <a class="social" href="https://www.instagram.com/parallel_visionfts" target="_blank" rel="noreferrer">
+              <span class="label">Instagram</span><span class="handle">@parallel_visionfts</span>
+            </a>
+            <a class="social" href="https://wa.me/5531983440061" target="_blank" rel="noreferrer">
+              <span class="label">WhatsApp</span><span class="handle">+55 31 98344-0061</span>
+            </a>
+            <a class="social" href="mailto:contato@parallelvision.com.br">
+              <span class="label">E-mail</span><span class="handle">contato@parallelvision.com.br</span>
+            </a>
+          </div>
+          <form id="contactForm">
+            <div class="field">
+              <input type="text" id="name" placeholder=" " required />
+              <label for="name">Nome</label>
+            </div>
+            <div class="field">
+              <input type="email" id="email" placeholder=" " required />
+              <label for="email">E-mail</label>
+            </div>
+            <div class="field">
+              <textarea id="msg" rows="4" placeholder=" " required></textarea>
+              <label for="msg">Seu projeto</label>
+            </div>
+            <button type="submit" class="submit"><span id="submitLabel">Enviar mensagem</span></button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="feed-head">
+        <p>Últimos frames — @parallel_visionfts</p>
+        <a href="https://www.instagram.com/parallel_visionfts" target="_blank" rel="noreferrer">Seguir →</a>
+      </div>
+      <div class="feed" id="feed"><!-- injected by JS --></div>
+      <div class="footer-word">PARALLEL VISION</div>
+      <div class="footer-bottom">
+        <p id="copy">© Parallel Vision — Todos os direitos reservados</p>
+        <p>Fotografia de rua · Japa &amp; Gelado</p>
+      </div>
+    </footer>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+      <button class="close" id="lbClose">Fechar ✕</button>
+      <button class="arrow prev" id="lbPrev">←</button>
+      <div class="stage">
+        <img id="lbImg" src="" alt="" />
+        <div class="lb-meta">
+          <span class="lb-title" id="lbTitle"></span>
+          <span class="lb-tag" id="lbTag"></span>
+        </div>
+      </div>
+      <button class="arrow next" id="lbNext">→</button>
+    </div>
+
+    <!-- LIBS (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.6/dist/lenis.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

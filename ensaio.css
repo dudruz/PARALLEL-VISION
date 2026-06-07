@@ -1,0 +1,446 @@
+/* ============================================================
+   PARALLEL VISION — ensaio.css
+   Estilos da página de ensaio dedicada.
+   ============================================================ */
+
+.ensaio-page { background: var(--black); }
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: var(--mega);
+  text-transform: uppercase;
+  color: var(--bone);
+}
+.back-link .back-arrow { transition: transform 0.3s; display: inline-block; }
+.back-link:hover .back-arrow { transform: translateX(-4px); }
+
+.ensaio-loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--concrete);
+}
+
+/* ---- Per-theme accent variable ---- */
+.ensaio-page[data-theme="flash"]    { --accent: var(--bone); }
+.ensaio-page[data-theme="ambar"]    { --accent: var(--amber); }
+.ensaio-page[data-theme="corre"]    { --accent: var(--burnt); }
+.ensaio-page[data-theme="basquete"] { --accent: #ff5e3a; }
+.ensaio-page { --accent: var(--burnt); }
+
+/* ============================================================
+   HERO DO ENSAIO
+   ============================================================ */
+.ens-hero {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.ens-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+.ens-hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #000 5%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5));
+}
+.ens-hero-inner {
+  position: relative;
+  z-index: 2;
+  padding: 0 1.25rem 4rem;
+  width: 100%;
+}
+.ens-hero-num {
+  font-family: var(--font-display);
+  font-size: 22vw;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(245, 241, 232, 0.25);
+  display: block;
+}
+.ens-hero-sub {
+  margin-top: 0.5rem;
+  font-size: 11px;
+  letter-spacing: var(--mega);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ens-hero-title {
+  font-family: var(--font-display);
+  font-size: 16vw;
+  line-height: 0.9;
+  color: var(--bone);
+  margin-top: 0.25rem;
+}
+.ens-scroll-hint {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.25rem;
+  z-index: 3;
+  font-size: 10px;
+  letter-spacing: var(--mega);
+  text-transform: uppercase;
+  color: rgba(245, 241, 232, 0.5);
+  writing-mode: vertical-rl;
+}
+
+/* ============================================================
+   CORPO / TEXTO CURATORIAL
+   ============================================================ */
+.ens-section { padding: 5rem 1.25rem; }
+.ens-intro {
+  font-family: var(--font-display);
+  font-size: 7vw;
+  line-height: 1.05;
+  color: var(--bone);
+  max-width: 20ch;
+}
+.ens-body {
+  margin-top: 2.5rem;
+  max-width: 60ch;
+}
+.ens-body p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(245, 241, 232, 0.7);
+  margin-bottom: 1.25rem;
+}
+
+/* ============================================================
+   FICHA TÉCNICA
+   ============================================================ */
+.ens-specs {
+  margin-top: 3rem;
+  border-top: 1px solid rgba(245, 241, 232, 0.15);
+}
+.ens-specs h3 {
+  font-size: 11px;
+  letter-spacing: var(--mega);
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 1.5rem 0 0.5rem;
+}
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.spec-item {
+  border-top: 1px solid rgba(245, 241, 232, 0.1);
+  padding: 1rem 0;
+}
+.spec-item .k {
+  font-size: 10px;
+  letter-spacing: var(--mega);
+  text-transform: uppercase;
+  color: rgba(245, 241, 232, 0.4);
+}
+.spec-item .v {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--bone);
+  margin-top: 0.25rem;
+}
+
+/* ============================================================
+   GALERIA DO ENSAIO — base
+   ============================================================ */
+.ens-gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  padding: 0 1.25rem 5rem;
+}
+.ens-shot {
+  position: relative;
+  overflow: hidden;
+  background: var(--concrete);
+  cursor: pointer;
+}
+.ens-shot img {
+  width: 100%;
+  display: block;
+  filter: grayscale(0.1);
+  transition: transform 0.7s var(--ease), filter 0.7s var(--ease);
+}
+.ens-shot:hover img { transform: scale(1.05); filter: grayscale(0); }
+.ens-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0;
+  mix-blend-mode: overlay;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+.ens-shot:hover::after { opacity: 0.2; }
+/* themed frame overlay (drawn per layout) */
+.ens-shot-frame { position: absolute; inset: 0; pointer-events: none; }
+
+/* reveal on scroll */
+.ens-reveal { opacity: 0; transform: translateY(40px); }
+.ens-reveal.in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+/* ============================================================
+   LAYOUT: AMBER — molduras douradas, cantos floridos, grade calorosa
+   ============================================================ */
+[data-layout="amber"] .ens-shot {
+  border-radius: 2px;
+}
+[data-layout="amber"] .ens-shot-frame {
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  margin: 8px;
+  inset: 0;
+}
+[data-layout="amber"] .ens-shot-frame::before,
+[data-layout="amber"] .ens-shot-frame::after {
+  content: "";
+  position: absolute;
+  width: 18px; height: 18px;
+  border: 2px solid var(--gold);
+}
+[data-layout="amber"] .ens-shot-frame::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+[data-layout="amber"] .ens-shot-frame::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+[data-layout="amber"] .ens-shot:hover .ens-shot-frame { border-color: var(--amber); }
+
+/* ============================================================
+   LAYOUT: SPORT — bordas vivas, recorte dinâmico, número de quadra
+   ============================================================ */
+[data-layout="sport"] .ens-shot {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgba(0, 212, 255, 0.0);
+  transition: box-shadow 0.4s;
+}
+[data-layout="sport"] .ens-shot:hover {
+  box-shadow: inset 0 0 0 3px var(--burnt);
+}
+[data-layout="sport"] .ens-shot::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 28px 28px 0 0;
+  border-color: var(--burnt) transparent transparent transparent;
+  z-index: 2;
+  opacity: 0.85;
+  transition: border-width 0.4s;
+}
+[data-layout="sport"] .ens-shot:hover::before { border-width: 40px 40px 0 0; }
+
+/* ============================================================
+   LAYOUT: NIGHT — moldura neon com brilho
+   ============================================================ */
+[data-layout="night"] .ens-shot-frame {
+  border: 1px solid rgba(255, 60, 56, 0.0);
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+[data-layout="night"] .ens-shot:hover .ens-shot-frame {
+  border-color: var(--neon);
+  box-shadow: inset 0 0 30px rgba(255, 60, 56, 0.35);
+}
+
+/* ============================================================
+   ORNAMENTOS NO HERO (por layout)
+   ============================================================ */
+.ens-ornaments { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.orn { position: absolute; }
+
+/* AMBER — florais detalhados + sol */
+.orn-sun {
+  position: absolute; top: 5%; right: 5%;
+  width: 24vw; max-width: 220px; height: auto;
+  opacity: 0.5; animation: spin 90s linear infinite;
+}
+.orn-bloom { width: 100%; height: 100%; }
+.orn-bloom-tl { top: 10%; left: 4%; width: 110px; height: 110px; animation: sway 7s ease-in-out infinite; }
+.orn-bloom-br { bottom: 14%; right: 6%; width: 80px; height: 80px; animation: sway 9s ease-in-out infinite reverse; }
+.orn-sprig { width: 100%; height: 100%; }
+.orn-sprig-l { bottom: 0; left: 8%; width: 70px; height: 150px; transform-origin: bottom center; animation: sway 6s ease-in-out infinite; }
+.orn-sprig-r { bottom: 0; right: 14%; width: 60px; height: 130px; transform-origin: bottom center; animation: sway 8s ease-in-out infinite reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes sway { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
+
+/* SPORT — bola quicando + linhas de quadra */
+.orn-court {
+  position: absolute;
+  bottom: -4%; left: 50%;
+  transform: translateX(-50%);
+  width: 60vw; max-width: 420px;
+  animation: pulse 4s ease-in-out infinite;
+}
+.orn-ball {
+  position: absolute;
+  top: 10%; right: 8%;
+  width: 16vw; max-width: 120px;
+  opacity: 0.7;
+  animation: bounce 3.4s ease-in-out infinite;
+}
+@keyframes bounce { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-18px) rotate(20deg)} }
+
+/* NIGHT */
+.orn-neon {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 80vw; max-width: 520px;
+  animation: pulse 5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.35} 50%{opacity:0.6} }
+
+/* ============================================================
+   PLAYER DE MÚSICA + EQUALIZER (batidas)
+   ============================================================ */
+.ens-player {
+  display: flex; align-items: center; gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+.ens-play {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  display: grid; place-items: center;
+  font-size: 0.9rem;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+  flex-shrink: 0;
+}
+.ens-play:hover { background: var(--accent); color: #000; transform: scale(1.06); }
+.ens-player-info { display: flex; flex-direction: column; gap: 0.4rem; }
+.ens-track-title {
+  font-size: 10px; letter-spacing: var(--mega); text-transform: uppercase;
+  color: rgba(245,241,232,0.6);
+}
+.ens-eq { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
+.ens-eq span {
+  width: 3px; height: 4px; background: var(--accent); opacity: 0.5;
+  border-radius: 2px;
+}
+.ens-eq.playing span { animation: eq 0.9s ease-in-out infinite; opacity: 1; }
+.ens-eq.playing span:nth-child(1){animation-delay:0s}
+.ens-eq.playing span:nth-child(2){animation-delay:.15s}
+.ens-eq.playing span:nth-child(3){animation-delay:.3s}
+.ens-eq.playing span:nth-child(4){animation-delay:.1s}
+.ens-eq.playing span:nth-child(5){animation-delay:.25s}
+.ens-eq.playing span:nth-child(6){animation-delay:.05s}
+.ens-eq.playing span:nth-child(7){animation-delay:.2s}
+@keyframes eq { 0%,100%{height:4px} 50%{height:18px} }
+
+/* batidas fluindo nas fotos: quando tocando, galeria pulsa suave */
+.ens-gallery.beat .ens-shot { animation: beatPulse 0.9s ease-in-out infinite; }
+.ens-gallery.beat .ens-shot:nth-child(even) { animation-delay: 0.45s; }
+@keyframes beatPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.012)} }
+
+@media (prefers-reduced-motion: reduce) {
+  .orn-sun,.orn-bloom-tl,.orn-bloom-br,.orn-sprig-l,.orn-sprig-r,
+  .orn-court,.orn-ball,.orn-neon,.ens-eq.playing span,.ens-gallery.beat .ens-shot { animation: none; }
+}
+
+/* MOBILE: remove flor/sprigs girando, deixa só um floral estático sutil */
+@media (max-width: 767px) {
+  .orn-sun { width: 38vw; opacity: 0.35; animation: none; top: 3%; right: 3%; }
+  .orn-bloom-br, .orn-sprig-r { display: none; }
+  .orn-bloom-tl { animation: none; width: 80px; height: 80px; opacity: 0.8; }
+  .orn-sprig-l { animation: none; opacity: 0.6; }
+}
+
+/* ============================================================
+   THEME ACCENTS — faixas decorativas animadas
+   ============================================================ */
+.theme-bar {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background-size: 200% 100%;
+  animation: barSlide 3s linear infinite;
+  opacity: 0.6;
+}
+@keyframes barSlide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* sport: aberração cromática que remete a movimento */
+.ensaio-page[data-layout="sport"] .ens-hero-title {
+  text-shadow: 3px 0 var(--burnt), -3px 0 #00d4ff;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.ensaio-footer {
+  border-top: 1px solid rgba(245, 241, 232, 0.15);
+  padding: 4rem 1.25rem 2rem;
+  text-align: center;
+}
+.ensaio-cta {
+  font-family: var(--font-display);
+  font-size: 7vw;
+  color: var(--bone);
+}
+.ensaio-cta .accent { color: var(--accent); }
+.ensaio-footer .footer-word {
+  margin-top: 3rem;
+  font-size: 18vw;
+}
+
+/* ============================================================
+   DESKTOP
+   ============================================================ */
+@media (min-width: 768px) {
+  .nav { padding: 1.25rem 2.5rem; }
+  .ens-hero-inner { padding: 0 2.5rem 5rem; }
+  .ens-hero-num { font-size: 12vw; }
+  .ens-hero-title { font-size: 9vw; }
+  .ens-section { padding: 7rem 2.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+  .ens-intro { font-size: 3vw; }
+  .ens-body { margin-top: 0; }
+  .ens-specs { grid-column: 1 / -1; }
+  .spec-grid { grid-template-columns: repeat(4, 1fr); gap: 0 2rem; }
+  .ens-gallery {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 0 2.5rem 7rem;
+    grid-auto-flow: dense;
+  }
+  /* vertical photos look best in portrait cells */
+  .ens-shot { aspect-ratio: 2 / 3; }
+  .ens-shot img { height: 100%; object-fit: cover; }
+  /* editorial rhythm: some shots span 2 rows (taller) without distorting */
+  [data-layout="amber"] .ens-shot:nth-child(7n+1) { grid-column: span 2; aspect-ratio: 3 / 2; }
+  [data-layout="amber"] .ens-shot:nth-child(7n+4) { grid-row: span 1; }
+  [data-layout="sport"] .ens-shot:nth-child(3n+1) { grid-column: span 2; aspect-ratio: 3 / 2; }
+  [data-layout="night"] .ens-shot:nth-child(4n+1) { grid-column: span 2; aspect-ratio: 3 / 2; }
+  .ensaio-cta { font-size: 3.5vw; }
+  .ensaio-footer .footer-word { font-size: 12vw; }
+}
+
+@media (max-width: 480px) {
+  .ens-intro { font-size: 9vw; }
+  .ensaio-cta { font-size: 9vw; }
+}
+
+/* mobile gallery: 2 columns, portrait cells */
+@media (max-width: 767px) {
+  .ens-gallery { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .ens-shot { aspect-ratio: 2 / 3; }
+  .ens-shot img { height: 100%; object-fit: cover; }
+  /* a foto de capa (1ª) ocupa a largura toda como abertura */
+  .ens-shot:first-child { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+}
