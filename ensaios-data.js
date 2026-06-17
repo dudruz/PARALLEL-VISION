@@ -252,7 +252,6 @@ window.ENSAIOS = {
      - Você envia o LINK DIRETO para a pessoa:
          ensaio.html?id=fotos_eduardo
      ============================================================ */
-  /*
   fotos_eduardo: {
     id: "fotos_eduardo",
     num: "P1",
@@ -277,6 +276,5 @@ window.ENSAIOS = {
       whatsapp: "5531983440061",
     },
   },
-  */
 };
 
