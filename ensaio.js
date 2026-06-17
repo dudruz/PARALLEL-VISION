@@ -5,6 +5,18 @@
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 
+// troca .jpeg/.jpg por .webp (versão otimizada)
+function webp(src) {
+  return src.replace(/\.(jpe?g|png)$/i, ".webp");
+}
+// monta <picture> com WebP + fallback original
+function pic(src, alt, cls, extra) {
+  return `<picture>
+    <source srcset="${webp(src)}" type="image/webp" />
+    <img src="${src}" alt="${alt || ""}" ${cls ? `class="${cls}"` : ""} loading="lazy" ${extra || ""} />
+  </picture>`;
+}
+
 function getId() {
   const p = new URLSearchParams(location.search);
   return p.get("id") || "flash";
@@ -93,7 +105,7 @@ function buildEnsaio(e) {
     .map(
       (src, i) => `
       <figure class="ens-shot ens-reveal" data-i="${i}">
-        <img src="${src}" alt="${e.title} — frame ${i + 1}" loading="lazy" />
+        ${pic(src, `${e.title} — frame ${i + 1}`)}
         <span class="ens-shot-frame"></span>
         ${wmHTML}
         ${ehPago ? `<span class="ens-shot-num">#${i + 1}</span>` : ""}
@@ -242,9 +254,15 @@ function buildEnsaio(e) {
     lbWm.innerHTML = Array.from({ length: 80 }, () => "<span>PARALLEL VISION</span>").join("");
     lbWm.style.display = "flex";
   }
-  const openLB = (i) => { lbIndex = i; $("#lbImg").src = gallery[i]; lb.classList.add("open"); if (window.__lenis) window.__lenis.stop(); };
+  const openLB = (i) => { lbIndex = i; setLbImg(gallery[i]); lb.classList.add("open"); if (window.__lenis) window.__lenis.stop(); };
   const closeLB = () => { lb.classList.remove("open"); if (window.__lenis) window.__lenis.start(); };
-  const stepLB = (d) => { lbIndex = (lbIndex + d + gallery.length) % gallery.length; $("#lbImg").src = gallery[lbIndex]; };
+  const stepLB = (d) => { lbIndex = (lbIndex + d + gallery.length) % gallery.length; setLbImg(gallery[lbIndex]); };
+  // usa webp no lightbox (com fallback automático do navegador via onerror)
+  function setLbImg(src) {
+    const img = $("#lbImg");
+    img.onerror = () => { img.onerror = null; img.src = src; }; // fallback p/ original
+    img.src = webp(src);
+  }
 
   $$(".ens-shot").forEach((el) => el.addEventListener("click", () => openLB(+el.dataset.i)));
   $("#lbClose").addEventListener("click", closeLB);
@@ -333,7 +351,7 @@ function abrirModalPedido(e) {
 
   const thumbs = galeria.map((src, i) => `
     <button type="button" class="pm-thumb" data-n="${i + 1}">
-      <img src="${src}" alt="Foto ${i + 1}" loading="lazy" />
+      ${pic(src, `Foto ${i + 1}`)}
       <span class="pm-thumb-num">#${i + 1}</span>
       <span class="pm-thumb-check">✓</span>
     </button>`).join("");
@@ -341,6 +359,7 @@ function abrirModalPedido(e) {
   const modal = document.createElement("div");
   modal.id = "pedidoModal";
   modal.className = "pm-overlay";
+  modal.setAttribute("data-lenis-prevent", "");
   modal.innerHTML = `
     <div class="pm-box">
       <button class="pm-close" id="pmClose" aria-label="Fechar">×</button>

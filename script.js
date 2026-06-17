@@ -65,6 +65,9 @@ const feed = [
 const $ = (s, ctx = document) => ctx.querySelector(s);
 const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
 
+// troca .jpeg/.jpg/.png por .webp (versão otimizada)
+function webp(src) { return src.replace(/\.(jpe?g|png)$/i, ".webp"); }
+
 document.documentElement.classList.add("js-reveal");
 
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -79,7 +82,10 @@ function renderWorks() {
     .map(
       (w, i) => `
     <button class="work ${w.cls}" data-i="${i}">
-      <img src="${w.src}" alt="${w.title}" loading="lazy" />
+      <picture>
+        <source srcset="${webp(w.src)}" type="image/webp" />
+        <img src="${w.src}" alt="${w.title}" loading="lazy" />
+      </picture>
       <div class="shade"></div>
       <div class="tint"></div>
       <span class="num">0${i + 1}</span>
@@ -109,10 +115,15 @@ function renderStories() {
         <div class="inner" ${s.wide ? "" : "data-parallax"}>${
           s.srcMobile
             ? `<picture>
+                 <source media="(max-width: 767px)" srcset="${webp(s.srcMobile)}" type="image/webp" />
                  <source media="(max-width: 767px)" srcset="${s.srcMobile}" />
+                 <source srcset="${webp(s.src)}" type="image/webp" />
                  <img src="${s.src}" alt="${s.title}" loading="lazy" />
                </picture>`
-            : `<img src="${s.src}" alt="${s.title}" loading="lazy" />`
+            : `<picture>
+                 <source srcset="${webp(s.src)}" type="image/webp" />
+                 <img src="${s.src}" alt="${s.title}" loading="lazy" />
+               </picture>`
         }</div>
         <div class="grad"></div>
       </div>
