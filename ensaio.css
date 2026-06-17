@@ -32,6 +32,7 @@
 .ensaio-page[data-theme="ambar"]    { --accent: var(--amber); }
 .ensaio-page[data-theme="corre"]    { --accent: var(--burnt); }
 .ensaio-page[data-theme="basquete"] { --accent: #ff5e3a; }
+.ensaio-page[data-theme="copa"]     { --accent: #ffdf00; }
 .ensaio-page { --accent: var(--burnt); }
 
 /* ============================================================
@@ -443,4 +444,284 @@
   .ens-shot img { height: 100%; object-fit: cover; }
   /* a foto de capa (1ª) ocupa a largura toda como abertura */
   .ens-shot:first-child { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+}
+
+/* ============================================================
+   LAYOUT: COPA (Brasil / Blayc) — bandeirinhas, confete, halftone
+   ============================================================ */
+
+/* halftone Brasil como textura de fundo atrás da galeria */
+[data-layout="copa"] .ens-gallery {
+  position: relative;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.9)),
+    url("img/brazil-halftone.jpg");
+  background-size: cover, 380px;
+  background-attachment: fixed, fixed;
+  background-position: center, center;
+  padding-top: 2.5rem;
+  padding-bottom: 7rem;
+}
+
+/* faixa verde-amarelo-azul no topo da galeria (pintura de rua) */
+[data-layout="copa"] .ens-gallery::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #009b3a 0 33%, #ffdf00 33% 66%, #002776 66% 100%);
+  z-index: 2;
+}
+
+/* molduras das fotos: borda verde-amarela */
+[data-layout="copa"] .ens-shot { border-radius: 2px; }
+[data-layout="copa"] .ens-shot-frame {
+  inset: 0;
+  border: 2px solid transparent;
+  transition: border-color 0.4s;
+}
+[data-layout="copa"] .ens-shot:hover .ens-shot-frame {
+  border-image: linear-gradient(135deg, #009b3a, #ffdf00, #002776) 1;
+}
+[data-layout="copa"] .ens-shot::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 22px 22px 0 0;
+  border-color: #ffdf00 transparent transparent transparent;
+  z-index: 2;
+  opacity: 0.9;
+}
+
+/* ---- BANDEIRINHAS (bunting) no hero ---- */
+.bunting {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  z-index: 3;
+  pointer-events: none;
+}
+.bunting-flag {
+  position: absolute;
+  top: 0;
+  width: 34px; height: 42px;
+  transform-origin: top center;
+  animation: flagWave 3s ease-in-out infinite;
+}
+.bunting-flag svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+.bunting::before {
+  content: "";
+  position: absolute;
+  top: 2px; left: 0; right: 0;
+  height: 2px;
+  background: rgba(245,241,232,0.3);
+}
+@keyframes flagWave {
+  0%,100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* ---- CONFETE verde/amarelo/azul ---- */
+.confetti-field {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti {
+  position: absolute;
+  top: -20px;
+  width: 8px; height: 12px;
+  border-radius: 2px;
+  opacity: 0.8;
+  animation: confettiFall linear infinite;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+}
+
+/* título do hero copa: contorno verde-amarelo */
+.ensaio-page[data-layout="copa"] .ens-hero-title {
+  color: var(--bone);
+  text-shadow: 2px 2px 0 rgba(0,155,58,0.5), -2px -2px 0 rgba(255,223,0,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bunting-flag, .confetti { animation: none; }
+  [data-layout="copa"] .ens-gallery { background-attachment: scroll, scroll; }
+}
+
+/* mobile: halftone não fixo (performance), bandeirinhas menores */
+@media (max-width: 767px) {
+  [data-layout="copa"] .ens-gallery { background-attachment: scroll, scroll; background-size: cover, 240px; }
+  .bunting-flag { width: 26px; height: 32px; }
+}
+
+/* ============================================================
+   BARRA DE VENDA (evento pago)
+   ============================================================ */
+.ens-venda { padding: 2rem 1.25rem; }
+.venda-card {
+  max-width: 680px; margin: 0 auto;
+  background: linear-gradient(135deg, rgba(255,107,45,0.12), rgba(255,179,71,0.06));
+  border: 1px solid rgba(255,179,71,0.3);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+}
+.venda-tag {
+  display: inline-block;
+  font-size: 0.65rem; letter-spacing: var(--mega); text-transform: uppercase;
+  color: #000; background: var(--amber);
+  padding: 0.3rem 0.7rem; border-radius: 999px; margin-bottom: 1rem;
+}
+.venda-card h3 {
+  font-family: var(--font-display); font-size: 1.8rem; color: var(--bone);
+  margin-bottom: 0.8rem;
+}
+.venda-precos { font-size: 1rem; color: rgba(245,241,232,0.8); margin-bottom: 0.5rem; }
+.venda-precos strong { color: var(--amber); }
+.venda-info { font-size: 0.85rem; color: rgba(245,241,232,0.55); margin-bottom: 1.5rem; line-height: 1.5; }
+.venda-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+.venda-btn {
+  padding: 0.8rem 1.4rem; font-size: 0.75rem; letter-spacing: var(--mega);
+  text-transform: uppercase; border-radius: 6px; cursor: pointer; font-weight: 600;
+  border: none; transition: transform 0.2s, background 0.3s;
+}
+.venda-btn:hover { transform: translateY(-2px); }
+.venda-btn.pay { background: var(--amber); color: #000; }
+.venda-btn.ask { background: var(--burnt); color: #000; }
+.venda-btn.ghost { background: transparent; border: 1px solid rgba(245,241,232,0.3); color: var(--bone); }
+
+/* número da foto (só em eventos pagos, ajuda o cliente a pedir por número) */
+.ens-shot-num {
+  position: absolute;
+  bottom: 0.5rem; right: 0.5rem;
+  background: rgba(0,0,0,0.7);
+  color: var(--bone);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ============================================================
+   MODAL DE PEDIDO (seleção de fotos)
+   ============================================================ */
+.pm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; backdrop-filter: blur(4px); }
+.pm-box { background: var(--charcoal); border: 1px solid rgba(245,241,232,0.15); border-radius: 14px; max-width: 640px; width: 100%; padding: 2rem; position: relative; margin: auto; }
+.pm-close, #pmClose2 { position: absolute; top: 1rem; right: 1rem; background: rgba(245,241,232,0.1); border: none; color: var(--bone); width: 36px; height: 36px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; line-height: 1; }
+.pm-close:hover, #pmClose2:hover { background: var(--burnt); color: #000; }
+.pm-title { font-family: var(--font-display); font-size: 1.6rem; color: var(--bone); margin-bottom: 1.2rem; padding-right: 2rem; }
+.pm-tipo { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+.pm-tipo-btn { flex: 1; min-width: 140px; background: var(--black); border: 1px solid rgba(245,241,232,0.2); color: rgba(245,241,232,0.7); padding: 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+.pm-tipo-btn.active { background: var(--burnt); color: #000; border-color: var(--burnt); font-weight: 600; }
+.pm-hint { font-size: 0.85rem; color: rgba(245,241,232,0.55); margin-bottom: 0.8rem; }
+.pm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; max-height: 320px; overflow-y: auto; padding: 0.2rem; }
+.pm-thumb { position: relative; aspect-ratio: 2/3; border: 2px solid transparent; border-radius: 6px; overflow: hidden; cursor: pointer; padding: 0; background: var(--black); }
+.pm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s, opacity 0.3s; }
+.pm-thumb-num { position: absolute; top: 0.2rem; left: 0.2rem; background: rgba(0,0,0,0.7); color: var(--bone); font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 999px; }
+.pm-thumb-check { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,107,45,0.55); color: #fff; font-size: 1.8rem; font-weight: 700; opacity: 0; transition: opacity 0.2s; }
+.pm-thumb.sel { border-color: var(--burnt); }
+.pm-thumb.sel .pm-thumb-check { opacity: 1; }
+.pm-thumb.sel img { transform: scale(1.05); }
+.pm-field { margin-bottom: 1rem; }
+.pm-field label { display: block; font-size: 0.7rem; letter-spacing: var(--mega); text-transform: uppercase; color: rgba(245,241,232,0.5); margin-bottom: 0.4rem; }
+.pm-field input { width: 100%; background: var(--black); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.8rem; border-radius: 4px; font-size: 0.95rem; }
+.pm-pack-msg { background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.25); border-radius: 8px; padding: 1rem; font-size: 0.9rem; color: rgba(245,241,232,0.8); margin-bottom: 1rem; }
+.pm-enviar { width: 100%; background: var(--burnt); color: #000; border: none; padding: 0.9rem; font-size: 0.85rem; letter-spacing: var(--mega); text-transform: uppercase; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
+.pm-enviar:hover { background: var(--amber); }
+.pm-enviar:disabled { opacity: 0.5; cursor: not-allowed; }
+.pm-obs { font-size: 0.78rem; color: rgba(245,241,232,0.45); text-align: center; margin-top: 0.8rem; line-height: 1.5; }
+.pm-err { background: rgba(255,60,56,0.15); color: #ff9b9b; padding: 0.7rem; border-radius: 4px; font-size: 0.85rem; margin-bottom: 0.8rem; }
+.pm-sucesso { text-align: center; padding: 1.5rem 0; }
+.pm-sucesso-ic { width: 60px; height: 60px; background: rgba(0,155,58,0.2); color: #4ade80; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem; }
+.pm-sucesso h3 { font-family: var(--font-display); font-size: 1.6rem; color: var(--bone); margin-bottom: 0.8rem; }
+.pm-sucesso p { color: rgba(245,241,232,0.7); line-height: 1.6; margin-bottom: 0.5rem; }
+
+/* ============================================================
+   MARCA D'ÁGUA AUTOMÁTICA — fotos de eventos pagos (preview)
+   Aplica via CSS sobre cada foto, sem precisar editar imagem.
+   ============================================================ */
+.ens-gallery-paga .ens-shot { position: relative; }
+.ens-gallery-paga .ens-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    -30deg,
+    transparent 0,
+    transparent 38px,
+    rgba(255,255,255,0.07) 38px,
+    rgba(255,255,255,0.07) 39px,
+    transparent 40px,
+    transparent 78px
+  );
+  background-size: cover;
+}
+.ens-gallery-paga .ens-shot .wm-text {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 0.2rem 0.7rem;
+  overflow: hidden;
+  transform: rotate(-30deg) scale(1.6);
+  opacity: 0.28;
+  user-select: none;
+}
+.ens-gallery-paga .ens-shot .wm-text span {
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+}
+
+/* marca d'água no LIGHTBOX (foto aberta) — densa, cobre tudo */
+.lb-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 0.6rem 1.4rem;
+  overflow: hidden;
+  transform: rotate(-30deg) scale(1.5);
+  opacity: 0.3;
+  user-select: none;
+}
+.lb-watermark span {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+#lightbox .stage { position: relative; }
+/* desencoraja arrastar/salvar a imagem */
+.ens-gallery-paga .ens-shot img,
+#lightbox img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }

@@ -17,17 +17,26 @@ const works = [
 
 const stories = [
   {
-    id: "ambar",
+    id: "blayc",
     num: "01",
+    title: "BLAYC",
+    sub: "Copa · Brasil · festa",
+    text: "A noite em que o Brasil inteiro coube numa festa. No evento Blayc, sob o tema da Copa, verde e amarelo viraram pele, festa e celebração — puro orgulho nacional no auge da euforia.",
+    src: "img/blayc_2.jpeg",
+    wide: true,
+  },
+  {
+    id: "ambar",
+    num: "02",
     title: "OLHAR ÂMBAR",
     sub: "Retrato · hora dourada",
     text: "Quando o sol baixo incendeia a cidade e tudo vira mel. Um ensaio de retrato na hora dourada — pele, cabelo e olhar banhados pela última luz quente do dia.",
     src: "img/ambar_10.jpeg",
-    wide: true,
+    srcMobile: "img/ambar_6.jpeg",
   },
   {
     id: "basquete",
-    num: "02",
+    num: "03",
     title: "QUADRA",
     sub: "Esporte · movimento · cor",
     text: "Basquete de rua sob o céu aberto. Salto e estilo na quadra do bairro — um ensaio sobre energia, atitude e a cor viva do esporte que pulsa na cidade.",
@@ -35,7 +44,7 @@ const stories = [
   },
   {
     id: "midnight",
-    num: "03",
+    num: "04",
     title: "MIDNIGHT 6.0",
     sub: "Noite · flash direto · neon",
     text: "A cidade depois que as luzes se acendem. Flash direto, neon e a textura da noite — um ensaio sobre presença e brilho no escuro, onde cada detalhe vira fonte de luz.",
@@ -97,7 +106,14 @@ function renderStories() {
       (s, i) => `
     <article class="story ${i % 2 ? "flip" : ""}">
       <div class="story-media scanlines ${s.wide ? "wide" : ""}">
-        <div class="inner" ${s.wide ? "" : "data-parallax"}><img src="${s.src}" alt="${s.title}" loading="lazy" /></div>
+        <div class="inner" ${s.wide ? "" : "data-parallax"}>${
+          s.srcMobile
+            ? `<picture>
+                 <source media="(max-width: 767px)" srcset="${s.srcMobile}" />
+                 <img src="${s.src}" alt="${s.title}" loading="lazy" />
+               </picture>`
+            : `<img src="${s.src}" alt="${s.title}" loading="lazy" />`
+        }</div>
         <div class="grad"></div>
       </div>
       <div class="story-body">
@@ -137,6 +153,13 @@ function openLightbox(i) {
   lbIndex = i;
   updateLightbox();
   $("#lightbox").classList.add("open");
+  // flash de obturador
+  const flash = $("#lbFlash");
+  if (flash) {
+    flash.classList.remove("fire");
+    void flash.offsetWidth; // reinicia animação
+    flash.classList.add("fire");
+  }
   if (window.__lenis) window.__lenis.stop();
 }
 function closeLightbox() {
@@ -226,9 +249,20 @@ function initCursor() {
   loop();
 
   document.addEventListener("mouseover", (e) => {
-    if (e.target.closest("a,button,[data-hover]")) ring.classList.add("is-hover");
+    const overShoot = e.target.closest(".work, .ens-shot, .hero-slide, #hero");
+    const overLink = e.target.closest("a,button,[data-hover]");
+    if (overShoot) {
+      ring.classList.add("shoot");
+      ring.classList.remove("is-hover");
+    } else if (overLink) {
+      ring.classList.add("is-hover");
+      ring.classList.remove("shoot");
+    }
   });
-  document.addEventListener("mouseout", () => ring.classList.remove("is-hover"));
+  document.addEventListener("mouseout", () => {
+    ring.classList.remove("is-hover");
+    ring.classList.remove("shoot");
+  });
 }
 
 /* ============================================================
@@ -271,12 +305,8 @@ function initSmoothAndAnimations() {
   });
 
   // Works fade-up stagger
-  $$(".work").forEach((el, i) => {
-    gsap.from(el, {
-      y: 60, opacity: 0, duration: 0.8, ease: "power2.out", delay: (i % 3) * 0.08,
-      scrollTrigger: { trigger: el, start: "top 90%" },
-    });
-  });
+  // Works reveal é feito pelo "curtain" (clip-path) — ver initCurtainReveal.
+  // Não usar gsap.from(y/opacity) aqui para não conflitar com o tilt 3D (transform).
 
   // Story media parallax
   $$("[data-parallax]").forEach((el) => {
@@ -400,6 +430,68 @@ function initCameraFlash() {
 }
 
 /* ============================================================
+   EFEITOS PREMIUM — progress, whatsapp float, tilt, curtain
+   ============================================================ */
+function initScrollProgress() {
+  const bar = $("#scrollProgress");
+  if (!bar) return;
+  const update = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    bar.style.width = pct + "%";
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  if (window.__lenis) window.__lenis.on("scroll", update);
+  update();
+}
+
+function initWhatsFloat() {
+  const wa = $("#waFloat");
+  const hero = $("#hero");
+  if (!wa || !hero) return;
+  // aparece depois que o hero sai da tela
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => wa.classList.toggle("show", !e.isIntersecting)),
+      { threshold: 0.2 }
+    );
+    io.observe(hero);
+  } else {
+    wa.classList.add("show");
+  }
+}
+
+function initTilt() {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  $$(".work").forEach((el) => {
+    el.addEventListener("mousemove", (e) => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `rotateY(${px * 7}deg) rotateX(${-py * 7}deg) scale(1.02)`;
+    });
+    el.addEventListener("mouseleave", () => {
+      el.style.transform = "";
+    });
+  });
+}
+
+function initCurtainReveal() {
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+    $$(".work").forEach((el) => el.classList.add("curtain"));
+    return;
+  }
+  $$(".work").forEach((el, i) => {
+    ScrollTrigger.create({
+      trigger: el,
+      start: "top 92%",
+      onEnter: () => setTimeout(() => el.classList.add("curtain"), (i % 3) * 90),
+    });
+  });
+}
+
+/* ============================================================
    BOOT
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -414,6 +506,10 @@ document.addEventListener("DOMContentLoaded", () => {
   safe(initCameraFlash);
   safe(initForm);
   safe(initSmoothAndAnimations);
+  safe(initScrollProgress);
+  safe(initWhatsFloat);
+  safe(initTilt);
+  safe(initCurtainReveal);
 
   // lightbox events
   safe(() => {

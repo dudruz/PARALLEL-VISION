@@ -1,13 +1,48 @@
 /* ============================================================
    PARALLEL VISION — ensaios-data.js
    Dados de cada ensaio dedicado. Editável livremente.
-   layout: "amber" | "sport" | "night"  -> molduras/animações distintas
+   layout: "amber" | "sport" | "night" | "copa"  -> molduras/animações distintas
    ============================================================ */
 window.ENSAIOS = {
+  /* ---------------- BLAYC (Copa / Brasil) ---------------- */
+  blayc: {
+    id: "blayc",
+    num: "01",
+    theme: "copa",
+    layout: "copa",
+    title: "BLAYC",
+    subtitle: "Copa · Brasil · festa",
+    cover: "img/blayc_9.jpeg",
+    coverMobile: "img/blayc_6.jpeg",
+    track: { title: "Trilha brasileira (à sua escolha)", file: "" },
+    intro:
+      "A noite em que o Brasil inteiro coube numa festa. No evento Blayc, sob o tema da Copa, verde e amarelo viraram pele, festa e celebração — um registro da nossa identidade no auge da euforia.",
+    body: [
+      "Camisas da seleção, bandeiras nas costas, dentes de ouro e a alegria que só o brasileiro tem. A Blayc reuniu uma geração que veste a cultura com orgulho, e a gente capturou cada gesto: o brinde, o grito, o abraço, a pose.",
+      "A luz da festa — neon, flash e cor — conversa com o verde-amarelo das camisas e bandeiras. É fotografia de evento com alma de ensaio: documental, vibrante e impossível de repetir. Puro Brasil.",
+    ],
+    specs: {
+      camera: "Canon EOS Rebel T7",
+      lens: "EF-S 18-55mm",
+      iso: "100–200",
+      shutter: "1/320 – 1/500s",
+      flash: "Flash direto + luz de festa",
+      local: "Evento Blayc · Belo Horizonte — MG",
+      ano: "2026",
+    },
+    gallery: [
+      "img/blayc_1.jpeg","img/blayc_9.jpeg","img/blayc_3.jpeg","img/blayc_2.jpeg",
+      "img/blayc_5.jpeg","img/blayc_4.jpeg","img/blayc_6.jpeg","img/blayc_11.jpeg",
+      "img/blayc_7.jpeg","img/blayc_12.jpeg","img/blayc_14.jpeg","img/blayc_8.jpeg",
+      "img/blayc_16.jpeg","img/blayc_17.jpeg","img/blayc_13.jpeg","img/blayc_18.jpeg",
+      "img/blayc_10.jpeg","img/blayc_15.jpeg",
+    ],
+  },
+
   /* ---------------- OLHAR ÂMBAR ---------------- */
   ambar: {
     id: "ambar",
-    num: "01",
+    num: "02",
     theme: "ambar",
     layout: "amber",
     title: "OLHAR ÂMBAR",
@@ -43,13 +78,13 @@ window.ENSAIOS = {
   /* ---------------- QUADRA (basquete) ---------------- */
   basquete: {
     id: "basquete",
-    num: "02",
+    num: "03",
     theme: "basquete",
     layout: "sport",
     title: "QUADRA",
     subtitle: "Esporte · movimento · cor",
     cover: "img/basq_3.jpeg",
-    track: { title: "Money Trees — vibe", file: "audio/Money Trees.mp3" },
+    track: { title: "Trap instrumental — vibe", file: "" },
     intro:
       "Basquete de rua sob o céu aberto. Salto e estilo na quadra do bairro — um ensaio sobre energia, atitude e a cor viva do esporte que pulsa na cidade.",
     body: [
@@ -74,13 +109,13 @@ window.ENSAIOS = {
   /* ---------------- MIDNIGHT 6.0 ----------------*/
   midnight: {
     id: "midnight",
-    num: "03",
+    num: "04",
     theme: "flash",
     layout: "night",
     title: "MIDNIGHT 6.0",
     subtitle: "Noite · flash direto · neon",
     cover: "img/IMG_2773.jpeg",
-    track: { title: "OS MELHORES", file: "audio/Matuê - OS MELHORES.mp3" },
+    track: { title: "Night vibe", file: "" },
     intro:
       "A cidade depois que as luzes se acendem. Flash direto, neon e a textura da noite — um ensaio sobre presença e brilho no escuro, onde cada detalhe vira fonte de luz.",
     body: [
@@ -101,4 +136,147 @@ window.ENSAIOS = {
       "img/IMG_2886.jpeg","img/IMG_2780.jpeg","img/IMG_2887.jpeg",
     ],
   },
+
+  /* ============================================================
+     EVENTOS PAGOS DE EXEMPLO (demonstração da loja)
+     Troque as fotos pelos PREVIEWS COM MARCA D'ÁGUA reais e o
+     linkPagamento pelo seu link do InfinitePay quando for usar.
+     Para remover da loja, é só apagar o bloco ou pôr paid: false.
+     ============================================================ */
+  baile_verao: {
+    id: "baile_verao",
+    num: "E1",
+    theme: "copa",
+    layout: "copa",
+    title: "BAILE DE VERÃO",
+    subtitle: "Jan 2026 · Belo Horizonte",
+    cover: "img/blayc_15.jpeg",
+    coverMobile: "img/blayc_1.jpeg",
+    intro: "A maior festa de verão da cidade. Calor, cor e muita gente bonita — registramos cada momento dessa noite inesquecível.",
+    body: [
+      "Um evento que reuniu o melhor da cena urbana de BH numa noite só. Flash direto, energia alta e aquele clima de festa que define o verão mineiro.",
+      "As fotos completas, sem marca d'água e em alta resolução, estão disponíveis no pack ou avulsas.",
+    ],
+    specs: {
+      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+      iso: "100–200", shutter: "1/320 – 1/500s",
+      flash: "Flash direto + luz de festa", local: "Belo Horizonte — MG", ano: "2026",
+    },
+    gallery: [
+      "img/blayc_15.jpeg","img/blayc_1.jpeg","img/blayc_13.jpeg","img/blayc_10.jpeg",
+      "img/blayc_11.jpeg","img/blayc_17.jpeg",
+    ],
+    venda: {
+      paid: true,
+      precoPack: "R$ 100",
+      precoFoto: "R$ 15",
+      linkPagamento: "https://invoice.infinitepay.io/SEU-LINK",
+      whatsapp: "5531983440061",
+    },
+  },
+
+  noite_arena: {
+    id: "noite_arena",
+    num: "E2",
+    theme: "basquete",
+    layout: "sport",
+    title: "NOITE ARENA",
+    subtitle: "Fev 2026 · quadra coberta",
+    cover: "img/basq_3.jpeg",
+    intro: "Esporte e festa na mesma noite. Um evento que misturou basquete de rua, som e atitude numa arena lotada.",
+    body: [
+      "Cobrimos o torneio e a festa que veio depois. Movimento, suor e a galera vibrando — tudo congelado no flash.",
+      "Pack completo e fotos avulsas disponíveis em alta resolução, sem marca d'água.",
+    ],
+    specs: {
+      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+      iso: "100–200", shutter: "1/320 – 1/500s",
+      flash: "Luz natural + flash", local: "Belo Horizonte — MG", ano: "2026",
+    },
+    gallery: [
+      "img/basq_3.jpeg","img/basq_1.jpeg","img/basq_6.jpeg","img/basq_2.jpeg",
+    ],
+    venda: {
+      paid: true,
+      precoPack: "R$ 100",
+      precoFoto: "R$ 15",
+      linkPagamento: "https://invoice.infinitepay.io/SEU-LINK",
+      whatsapp: "5531983440061",
+    },
+  },
+
+  /* ============================================================
+     MODELO DE EVENTO PAGO (copie e descomente quando for criar um)
+     ------------------------------------------------------------
+     Diferença para os ensaios grátis: tem o campo "venda".
+     - paid: true            -> ativa o modo venda (preview com marca d'água)
+     - precoPack / precoFoto -> valores mostrados
+     - linkPagamento         -> seu link do InfinitePay
+     - whatsapp              -> fallback de contato/combinação
+     As fotos em "gallery" aqui são os PREVIEWS COM MARCA D'ÁGUA.
+     As originais limpas ficam no Supabase (ver guia).
+     ============================================================ */
+  /*
+  evento_exemplo: {
+    id: "evento_exemplo",
+    num: "05",
+    theme: "copa",
+    layout: "copa",
+    title: "EVENTO X",
+    subtitle: "Data · local",
+    cover: "img/eventox_1.jpeg",
+    intro: "Descrição curta do evento.",
+    body: ["Parágrafo 1.", "Parágrafo 2."],
+    specs: {
+      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+      iso: "100–200", shutter: "1/320 – 1/500s",
+      flash: "Flash direto", local: "Local — MG", ano: "2026",
+    },
+    gallery: ["img/eventox_1.jpeg","img/eventox_2.jpeg"],  // PREVIEWS com marca
+    venda: {
+      paid: true,
+      precoPack: "R$ 30",
+      precoFoto: "R$ 15",
+      linkPagamento: "https://invoice.infinitepay.io/SEU-LINK",
+      whatsapp: "5531983440061",
+    },
+  },
+  */
+
+  /* ============================================================
+     MODELO DE EVENTO PRIVADO (só um e-mail pode comprar/acessar)
+     ------------------------------------------------------------
+     Igual ao evento pago, mas com "emailPermitido" dentro de venda.
+     - NÃO aparece na loja nem no dropdown de acesso (é secreto)
+     - Só o e-mail autorizado consegue pedir e acessar
+     - Você envia o LINK DIRETO para a pessoa:
+         ensaio.html?id=fotos_eduardo
+     ============================================================ */
+  /*
+  fotos_eduardo: {
+    id: "fotos_eduardo",
+    num: "P1",
+    theme: "amber",
+    layout: "amber",
+    title: "FOTOS EDUARDO",
+    subtitle: "Ensaio privado",
+    cover: "img/eduardo_1.jpeg",
+    intro: "Ensaio exclusivo.",
+    body: ["Suas fotos."],
+    specs: {
+      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+      iso: "100–200", shutter: "1/320 – 1/500s",
+      flash: "Natural", local: "BH — MG", ano: "2026",
+    },
+    gallery: ["img/eduardo_1.jpeg","img/eduardo_2.jpeg"],
+    venda: {
+      paid: true,
+      precoPack: "R$ 50",
+      precoFoto: "R$ 8",
+      emailPermitido: "evmoreirar@gmail.com",  // SÓ este e-mail acessa
+      whatsapp: "5531983440061",
+    },
+  },
+  */
 };
+

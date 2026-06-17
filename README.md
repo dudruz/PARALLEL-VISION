@@ -160,3 +160,22 @@ Alternativas: **GitHub Pages**, **Vercel**, **Cloudflare Pages**.
 ---
 
 *Parallel Vision — fotografia de rua, cultura e movimento.*
+
+---
+
+## ✨ Efeitos visuais (premium)
+
+Pensados para reforçar a linguagem fotográfica e atrair clientes:
+
+- **Ken Burns no hero** — zoom cinematográfico lento nas fotos
+- **Cursor viewfinder** — sobre as fotos, o cursor vira mira de câmera
+- **Flash de obturador** — clicar numa foto dispara um flash (como fotografar)
+- **Tilt 3D** — as fotos dos Trabalhos inclinam seguindo o mouse (desktop)
+- **Reveal de cortina** — fotos surgem como se fossem reveladas
+- **Marquee editorial** — faixa rolando estilo HYPEBEAST
+- **Marquee CTA** — "ENSAIOS ABERTOS • AGENDE PELO WHATSAPP" (clicável → contato)
+- **WhatsApp flutuante** — botão com pulso, aparece ao rolar (conversão direta)
+- **Barra de progresso** — timeline de leitura no topo
+- **Autoplay de música** nos ensaios (no primeiro gesto, por regra dos navegadores)
+
+Todos respeitam `prefers-reduced-motion` (acessibilidade).

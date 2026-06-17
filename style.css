@@ -69,11 +69,11 @@ button {
   width: 0;
 }
 
-/* hide native cursor on fine-pointer devices */
+/* hide native cursor on fine-pointer devices — ONLY on pages with the custom cursor */
 @media (hover: hover) and (pointer: fine) {
-  body,
-  a,
-  button {
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button {
     cursor: none;
   }
 }
@@ -1164,3 +1164,178 @@ footer {
   #contact h2.cta { font-size: 128px; }
   .footer-word { font-size: 192px; }
 }
+
+/* ============================================================
+   EFEITOS PREMIUM — câmera, cinema, conversão
+   ============================================================ */
+
+/* ---- SCROLL PROGRESS (timeline de filme) ---- */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--burnt), var(--amber), var(--neon));
+  z-index: 9500;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px rgba(255,107,45,0.6);
+}
+
+/* ---- KEN BURNS (zoom cinematográfico no hero) ---- */
+.hero-slide.active {
+  animation: kenburns 9s ease-out forwards;
+}
+@keyframes kenburns {
+  0%   { transform: scale(1.0); }
+  100% { transform: scale(1.12); }
+}
+
+/* ---- CURSOR VIEWFINDER (mira de câmera sobre fotos) ---- */
+.cursor-ring.shoot {
+  width: 74px; height: 74px;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--burnt),var(--burnt)) left top,
+    linear-gradient(var(--burnt),var(--burnt)) left top,
+    linear-gradient(var(--burnt),var(--burnt)) right top,
+    linear-gradient(var(--burnt),var(--burnt)) right top,
+    linear-gradient(var(--burnt),var(--burnt)) left bottom,
+    linear-gradient(var(--burnt),var(--burnt)) left bottom,
+    linear-gradient(var(--burnt),var(--burnt)) right bottom,
+    linear-gradient(var(--burnt),var(--burnt)) right bottom;
+  background-repeat: no-repeat;
+  background-size: 12px 2px, 2px 12px;
+}
+.cursor-ring.shoot::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 4px; height: 4px;
+  background: var(--neon);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+}
+
+/* ---- MARQUEE EDITORIAL (HYPEBEAST vibe) ---- */
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(245,241,232,0.12);
+  border-bottom: 1px solid rgba(245,241,232,0.12);
+  padding: 1.1rem 0;
+  background: var(--charcoal);
+  display: block;
+}
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  white-space: nowrap;
+  animation: marquee 28s linear infinite;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--bone);
+  letter-spacing: 0.02em;
+}
+.marquee-track .dot { color: var(--burnt); font-size: 0.7rem; }
+.marquee-track .dot.accent { color: var(--neon); }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* CTA marquee — clicável, hover acende */
+.marquee-cta {
+  border: none;
+  border-top: 1px solid rgba(255,60,56,0.25);
+  border-bottom: 1px solid rgba(255,60,56,0.25);
+  background: linear-gradient(180deg, rgba(74,14,14,0.25), transparent);
+  cursor: pointer;
+  transition: background 0.4s;
+}
+.marquee-cta .marquee-track { animation-duration: 22s; }
+.marquee-cta:hover { background: linear-gradient(180deg, rgba(255,60,56,0.18), transparent); }
+.marquee-cta:hover .marquee-track span { color: var(--burnt); }
+
+/* ---- WHATSAPP FLUTUANTE ---- */
+.wa-float {
+  position: fixed;
+  bottom: 1.4rem; right: 1.4rem;
+  z-index: 9400;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #07261a;
+  display: grid; place-items: center;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  pointer-events: none;
+}
+.wa-float.show { opacity: 1; transform: none; pointer-events: auto; }
+.wa-float:hover { transform: scale(1.1); box-shadow: 0 10px 34px rgba(37,211,102,0.5); }
+.wa-float svg { width: 30px; height: 30px; position: relative; z-index: 2; }
+.wa-pulse {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: #25d366;
+  animation: waPulse 2.2s ease-out infinite;
+  z-index: 1;
+}
+@keyframes waPulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* ---- LIGHTBOX: FLASH DE OBTURADOR ---- */
+.lb-flash {
+  position: absolute; inset: 0;
+  background: var(--bone);
+  opacity: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.lb-flash.fire { animation: shutter 0.45s ease-out; }
+@keyframes shutter {
+  0% { opacity: 0; }
+  8% { opacity: 0.9; }
+  35% { opacity: 0.05; }
+  100% { opacity: 0; }
+}
+
+/* ---- WORKS: reveal de cortina (foto revelando) ---- */
+.work {
+  clip-path: inset(0 0 0 0);
+}
+.work.curtain {
+  animation: curtainUp 0.9s var(--ease) both;
+}
+@keyframes curtainUp {
+  0% { clip-path: inset(100% 0 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+/* ---- WORKS: tilt 3D (premium, desktop) ---- */
+@media (hover: hover) and (pointer: fine) {
+  .works-grid { perspective: 1200px; }
+  .work { transition: transform 0.25s ease, box-shadow 0.4s ease; transform-style: preserve-3d; }
+  .work:hover { box-shadow: 0 30px 60px rgba(0,0,0,0.55); z-index: 5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide.active, .marquee-track, .wa-pulse, .work.curtain { animation: none; }
+  .scroll-progress { transition: none; }
+}
+
+/* mobile: marquee menor, wa-float um pouco menor */
+@media (max-width: 480px) {
+  .marquee-track { font-size: 1.2rem; }
+  .wa-float { width: 52px; height: 52px; bottom: 1rem; right: 1rem; }
+}
+
+/* links legais no footer */
+.footer-links { margin-top: 0.8rem; display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.footer-links a { color: rgba(245,241,232,0.55); text-decoration: none; font-size: 0.8rem; transition: color 0.3s; border-bottom: 1px solid transparent; }
+.footer-links a:hover { color: var(--burnt); border-bottom-color: var(--burnt); }
+.footer-links span { color: rgba(245,241,232,0.3); }

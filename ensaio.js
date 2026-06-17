@@ -56,6 +56,26 @@ function ornaments(layout) {
         <circle cx="200" cy="200" r="170" stroke="var(--amber)" stroke-width="1" opacity="0.25"/>
       </svg>`;
   }
+  if (layout === "copa") {
+    // bandeirinhas do Brasil (bunting) no topo + confete verde/amarelo
+    const flag = (x, delay) => `
+      <div class="bunting-flag" style="left:${x}%; animation-delay:${delay}s">
+        <svg viewBox="0 0 40 50"><polygon points="0,0 40,0 20,42" fill="#009b3a"/>
+          <polygon points="6,0 34,0 20,30" fill="#ffdf00"/><circle cx="20" cy="12" r="6" fill="#002776"/></svg>
+      </div>`;
+    const flags = Array.from({ length: 11 }).map((_, i) => flag(i * 9 + 2, (i % 4) * 0.25)).join("");
+    const confetti = Array.from({ length: 18 }).map(() => {
+      const colors = ["#009b3a", "#ffdf00", "#002776"];
+      const c = colors[Math.floor(Math.random() * 3)];
+      const x = (Math.random() * 100).toFixed(0);
+      const d = (Math.random() * 5).toFixed(1);
+      const dur = (4 + Math.random() * 4).toFixed(1);
+      return `<span class="confetti" style="left:${x}%; background:${c}; animation-delay:${d}s; animation-duration:${dur}s"></span>`;
+    }).join("");
+    return `
+      <div class="bunting">${flags}</div>
+      <div class="confetti-field">${confetti}</div>`;
+  }
   return "";
 }
 
@@ -65,12 +85,18 @@ function buildEnsaio(e) {
   document.title = `${e.title} — PARALLEL VISION`;
 
   const specs = e.specs || {};
+  const ehPago = e.venda && e.venda.paid;
+  const wmHTML = ehPago
+    ? `<span class="wm-text">${Array.from({ length: 60 }, () => "<span>PARALLEL VISION</span>").join("")}</span>`
+    : "";
   const galleryHTML = (e.gallery || [])
     .map(
       (src, i) => `
       <figure class="ens-shot ens-reveal" data-i="${i}">
         <img src="${src}" alt="${e.title} — frame ${i + 1}" loading="lazy" />
         <span class="ens-shot-frame"></span>
+        ${wmHTML}
+        ${ehPago ? `<span class="ens-shot-num">#${i + 1}</span>` : ""}
       </figure>`
     )
     .join("");
@@ -122,7 +148,25 @@ function buildEnsaio(e) {
 
     <div class="theme-bar"></div>
 
-    <section class="ens-gallery">
+    ${e.venda && e.venda.paid ? `
+    <section class="ens-venda" id="ensVenda">
+      <div class="venda-card">
+        <span class="venda-tag">Evento pago</span>
+        <h3>Quer as fotos sem marca d'água?</h3>
+        <p class="venda-precos">
+          Pack completo <strong>${e.venda.precoPack || ""}</strong>
+          ${e.venda.precoFoto ? ` · Foto avulsa <strong>${e.venda.precoFoto}</strong>` : ""}
+        </p>
+        <p class="venda-info">Pague pelo link, depois é só pedir aqui com seu e-mail. Liberamos o acesso por ${(window.PV_CONFIG||{}).DIAS_ACESSO || 5} dias.</p>
+        <div class="venda-actions">
+          ${e.venda.linkPagamento ? `<a class="venda-btn pay" href="${e.venda.linkPagamento}" target="_blank" rel="noreferrer">Pagar agora</a>` : ""}
+          <button class="venda-btn ask" id="btnPedir">Já paguei — pedir fotos</button>
+          <a class="venda-btn ghost" href="acesso.html?evento=${e.id}" >Já tenho acesso</a>
+        </div>
+      </div>
+    </section>` : ""}
+
+    <section class="ens-gallery${ehPago ? " ens-gallery-paga" : ""}">
       ${galleryHTML}
     </section>
   `;
@@ -181,10 +225,23 @@ function buildEnsaio(e) {
     }
   }
 
+  // fluxo de PEDIDO (evento pago) — abre modal com miniaturas
+  const btnPedir = $("#btnPedir");
+  if (btnPedir) {
+    btnPedir.addEventListener("click", () => abrirModalPedido(e));
+  }
+
   // lightbox wiring
   const gallery = e.gallery || [];
+  const ehPagoLB = e.venda && e.venda.paid;
   let lbIndex = 0;
   const lb = $("#lightbox");
+  // monta a marca d'água do lightbox (densa) se for pago
+  const lbWm = $("#lbWatermark");
+  if (ehPagoLB && lbWm) {
+    lbWm.innerHTML = Array.from({ length: 80 }, () => "<span>PARALLEL VISION</span>").join("");
+    lbWm.style.display = "flex";
+  }
   const openLB = (i) => { lbIndex = i; $("#lbImg").src = gallery[i]; lb.classList.add("open"); if (window.__lenis) window.__lenis.stop(); };
   const closeLB = () => { lb.classList.remove("open"); if (window.__lenis) window.__lenis.start(); };
   const stepLB = (d) => { lbIndex = (lbIndex + d + gallery.length) % gallery.length; $("#lbImg").src = gallery[lbIndex]; };
@@ -194,6 +251,14 @@ function buildEnsaio(e) {
   $("#lbPrev").addEventListener("click", () => stepLB(-1));
   $("#lbNext").addEventListener("click", () => stepLB(1));
   lb.addEventListener("click", (ev) => { if (ev.target.id === "lightbox") closeLB(); });
+
+  // em eventos pagos: dificulta salvar (clique direito) nas fotos
+  if (ehPagoLB) {
+    const bloquear = (ev) => { ev.preventDefault(); return false; };
+    $$(".ens-shot img").forEach((img) => img.addEventListener("contextmenu", bloquear));
+    const lbImg = $("#lbImg");
+    if (lbImg) lbImg.addEventListener("contextmenu", bloquear);
+  }
   document.addEventListener("keydown", (ev) => {
     if (!lb.classList.contains("open")) return;
     if (ev.key === "Escape") closeLB();
@@ -251,3 +316,200 @@ document.addEventListener("DOMContentLoaded", () => {
   try { initCursor(); } catch (err) { console.warn(err); }
   try { initMotion(); } catch (err) { console.warn(err); $$(".ens-reveal").forEach((el)=>el.classList.add("in")); }
 });
+
+/* ============================================================
+   MODAL DE PEDIDO — seleção de fotos com miniatura + digitar
+   ============================================================ */
+function abrirModalPedido(e) {
+  const $ = (s) => document.querySelector(s);
+  // remove modal anterior se existir
+  const antigo = document.getElementById("pedidoModal");
+  if (antigo) antigo.remove();
+
+  const galeria = e.gallery || [];
+  const precoPack = (e.venda && e.venda.precoPack) || "";
+  const precoFoto = (e.venda && e.venda.precoFoto) || "";
+  const wpp = (window.PV_CONFIG || {}).WHATSAPP || "";
+
+  const thumbs = galeria.map((src, i) => `
+    <button type="button" class="pm-thumb" data-n="${i + 1}">
+      <img src="${src}" alt="Foto ${i + 1}" loading="lazy" />
+      <span class="pm-thumb-num">#${i + 1}</span>
+      <span class="pm-thumb-check">✓</span>
+    </button>`).join("");
+
+  const modal = document.createElement("div");
+  modal.id = "pedidoModal";
+  modal.className = "pm-overlay";
+  modal.innerHTML = `
+    <div class="pm-box">
+      <button class="pm-close" id="pmClose" aria-label="Fechar">×</button>
+      <h3 class="pm-title">Pedir fotos — ${e.title}</h3>
+
+      <div class="pm-tipo">
+        <button type="button" class="pm-tipo-btn active" data-tipo="fotos">Fotos avulsas ${precoFoto ? `(${precoFoto} cada)` : ""}</button>
+        <button type="button" class="pm-tipo-btn" data-tipo="pack">Pack completo ${precoPack ? `(${precoPack})` : ""}</button>
+      </div>
+
+      <div id="pmFotosArea">
+        <p class="pm-hint">Clique nas fotos que você quer, ou digite os números abaixo.</p>
+        <div class="pm-grid">${thumbs}</div>
+        <div class="pm-field">
+          <label>Números das fotos (separados por vírgula)</label>
+          <input type="text" id="pmNums" placeholder="ex: 1, 4, 7" />
+        </div>
+      </div>
+
+      <div id="pmPackMsg" class="pm-pack-msg" style="display:none">
+        Você está pedindo o <strong>pack completo</strong> (todas as ${galeria.length} fotos).
+      </div>
+
+      <div class="pm-field">
+        <label>Seu nome</label>
+        <input type="text" id="pmNome" placeholder="Seu nome" />
+      </div>
+      <div class="pm-field">
+        <label>Seu e-mail (onde você recebe o acesso)</label>
+        <input type="email" id="pmEmail" placeholder="seu@email.com" />
+      </div>
+
+      <div id="pmMsg"></div>
+      <button class="pm-enviar" id="pmEnviar">Enviar pedido</button>
+      <p class="pm-obs">Depois de confirmarmos o pagamento, você recebe um código de acesso por e-mail.</p>
+    </div>`;
+  document.body.appendChild(modal);
+  if (window.__lenis) window.__lenis.stop();
+
+  let tipo = "fotos";
+  const selecionadas = new Set();
+
+  const sincronizarNums = () => {
+    $("#pmNums").value = [...selecionadas].sort((a, b) => a - b).join(", ");
+  };
+  const sincronizarThumbs = () => {
+    modal.querySelectorAll(".pm-thumb").forEach((t) => {
+      const n = +t.dataset.n;
+      t.classList.toggle("sel", selecionadas.has(n));
+    });
+  };
+
+  // clicar nas miniaturas
+  modal.querySelectorAll(".pm-thumb").forEach((t) => {
+    t.addEventListener("click", () => {
+      const n = +t.dataset.n;
+      if (selecionadas.has(n)) selecionadas.delete(n); else selecionadas.add(n);
+      sincronizarThumbs(); sincronizarNums();
+    });
+  });
+
+  // digitar números reflete nas miniaturas
+  $("#pmNums").addEventListener("input", () => {
+    selecionadas.clear();
+    $("#pmNums").value.split(",").forEach((x) => {
+      const n = parseInt(x.trim().replace(/\D/g, ""), 10);
+      if (n >= 1 && n <= galeria.length) selecionadas.add(n);
+    });
+    sincronizarThumbs();
+  });
+
+  // alternar tipo (fotos / pack)
+  modal.querySelectorAll(".pm-tipo-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      modal.querySelectorAll(".pm-tipo-btn").forEach((x) => x.classList.remove("active"));
+      b.classList.add("active");
+      tipo = b.dataset.tipo;
+      $("#pmFotosArea").style.display = tipo === "fotos" ? "block" : "none";
+      $("#pmPackMsg").style.display = tipo === "pack" ? "block" : "none";
+    });
+  });
+
+  // fechar
+  const fechar = () => { modal.remove(); if (window.__lenis) window.__lenis.start(); };
+  $("#pmClose").addEventListener("click", fechar);
+  modal.addEventListener("click", (ev) => { if (ev.target === modal) fechar(); });
+
+  // enviar
+  $("#pmEnviar").addEventListener("click", async () => {
+    const email = $("#pmEmail").value.trim();
+    const nome = $("#pmNome").value.trim();
+    $("#pmMsg").innerHTML = "";
+    if (!email) { $("#pmMsg").innerHTML = `<div class="pm-err">Digite seu e-mail.</div>`; return; }
+    // evento privado: só o(s) e-mail(s) permitido(s) pode(m) pedir
+    if (e.venda && (e.venda.emailPermitido || e.venda.emailsPermitidos)) {
+      const lista = e.venda.emailsPermitidos || [e.venda.emailPermitido];
+      const permitidos = lista.map((x) => String(x).toLowerCase().trim());
+      if (!permitidos.includes(email.toLowerCase())) {
+        $("#pmMsg").innerHTML = `<div class="pm-err">Este é um evento privado. Use o e-mail autorizado para acessar.</div>`;
+        return;
+      }
+    }
+    let fotos = [];
+    if (tipo === "fotos") {
+      fotos = [...selecionadas].sort((a, b) => a - b).map(String);
+      if (!fotos.length) { $("#pmMsg").innerHTML = `<div class="pm-err">Escolha pelo menos uma foto (clique ou digite os números).</div>`; return; }
+    }
+    const btn = $("#pmEnviar");
+    btn.disabled = true; btn.textContent = "Processando…";
+    try {
+      const pedido = await window.PV_VENDA.criarPedido({ email, nome, evento: e.id, tipo, fotos });
+
+      // tenta gerar o link de pagamento automático (Edge Function)
+      const cfg = window.PV_CONFIG || {};
+      const supaUrl = cfg.SUPABASE_URL || "";
+      let linkPagamento = null;
+      if (supaUrl && pedido && pedido.id) {
+        try {
+          const resp = await fetch(`${supaUrl}/functions/v1/criar-pagamento`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${cfg.SUPABASE_ANON_KEY || ""}`,
+            },
+            body: JSON.stringify({
+              pedido_id: pedido.id,
+              precoPack: e.venda.precoPack,
+              precoFoto: e.venda.precoFoto,
+              qtdFotos: fotos.length,
+              evento: e.id,
+              titulo: e.title,
+            }),
+          });
+          const dados = await resp.json();
+          if (dados && dados.url) linkPagamento = dados.url;
+        } catch (errPag) {
+          linkPagamento = null; // função não publicada ainda → modo manual
+        }
+      }
+
+      if (linkPagamento) {
+        // pagamento automático: redireciona pro InfinitePay
+        modal.querySelector(".pm-box").innerHTML = `
+          <div class="pm-sucesso">
+            <div class="pm-sucesso-ic">→</div>
+            <h3>Redirecionando para o pagamento…</h3>
+            <p>Você será levado para a tela de pagamento segura. Após pagar, recebe o código por e-mail automaticamente.</p>
+          </div>`;
+        setTimeout(() => { window.location.href = linkPagamento; }, 1500);
+      } else {
+        // modo manual (link fixo ou WhatsApp): mantém o fluxo antigo
+        const linkFixo = e.venda.linkPagamento && !e.venda.linkPagamento.includes("SEU-LINK") ? e.venda.linkPagamento : null;
+        modal.querySelector(".pm-box").innerHTML = `
+          <button class="pm-close" id="pmClose2">×</button>
+          <div class="pm-sucesso">
+            <div class="pm-sucesso-ic">✓</div>
+            <h3>Pedido registrado!</h3>
+            ${linkFixo
+              ? `<p>Finalize o pagamento no link abaixo. Depois é só aguardar o código de acesso por e-mail.</p>
+                 <a href="${linkFixo}" target="_blank" class="pm-enviar" style="display:inline-block;text-decoration:none;margin-top:1rem">Pagar agora</a>`
+              : `<p>Assim que confirmarmos o pagamento, você recebe um <strong>código de acesso</strong> no e-mail <strong>${email}</strong>.</p>`}
+            <p class="pm-obs">Dúvidas? Chame no WhatsApp ${wpp}.</p>
+          </div>`;
+        const c2 = modal.querySelector("#pmClose2");
+        if (c2) c2.addEventListener("click", fechar);
+      }
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "Enviar pedido";
+      $("#pmMsg").innerHTML = `<div class="pm-err">Não foi possível enviar: ${err.message}${wpp ? `<br/>Chame no WhatsApp: ${wpp}` : ""}</div>`;
+    }
+  });
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Marca d'água — Parallel Vision</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { background: var(--black); color: var(--bone); min-height: 100vh; }
+      .wm-wrap { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+      .wm-head { text-align: center; margin-bottom: 2rem; }
+      .wm-head .brand { font-family: var(--font-display); font-size: 1.3rem; }
+      .wm-head .brand .slash { color: var(--burnt); }
+      .wm-head h1 { font-family: var(--font-display); font-size: 2.4rem; margin-top: 1rem; }
+      .wm-head p { color: rgba(245,241,232,0.6); margin-top: 0.5rem; font-size: 0.95rem; }
+
+      .controls { background: var(--charcoal); border: 1px solid rgba(245,241,232,0.12); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .controls .full { grid-column: 1 / -1; }
+      .controls label { display: block; font-size: 0.7rem; letter-spacing: var(--mega); text-transform: uppercase; color: rgba(245,241,232,0.5); margin-bottom: 0.4rem; }
+      .controls input[type="text"], .controls input[type="number"] { width: 100%; background: var(--black); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.7rem; border-radius: 4px; font-size: 0.95rem; }
+      .controls input[type="range"] { width: 100%; }
+      .range-val { color: var(--amber); font-weight: 600; }
+
+      .drop { border: 2px dashed rgba(255,179,71,0.4); border-radius: 12px; padding: 3rem 1.5rem; text-align: center; cursor: pointer; transition: background 0.3s, border-color 0.3s; background: rgba(255,179,71,0.04); }
+      .drop:hover, .drop.over { background: rgba(255,179,71,0.1); border-color: var(--amber); }
+      .drop .big { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 0.5rem; }
+      .drop .small { font-size: 0.85rem; color: rgba(245,241,232,0.5); }
+
+      .actions { display: flex; gap: 0.7rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+      .btn-wm { background: var(--burnt); color: #000; border: none; padding: 0.9rem 1.8rem; font-size: 0.8rem; letter-spacing: var(--mega); text-transform: uppercase; cursor: pointer; border-radius: 6px; font-weight: 600; }
+      .btn-wm:hover { background: var(--amber); }
+      .btn-wm:disabled { opacity: 0.4; cursor: not-allowed; }
+      .btn-ghost2 { background: transparent; border: 1px solid rgba(245,241,232,0.3); color: var(--bone); padding: 0.9rem 1.8rem; font-size: 0.8rem; letter-spacing: var(--mega); text-transform: uppercase; cursor: pointer; border-radius: 6px; }
+
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 0.9rem; margin-top: 1.5rem; }
+      .card { background: var(--charcoal); border-radius: 8px; overflow: hidden; border: 1px solid rgba(245,241,232,0.1); }
+      .card img { width: 100%; display: block; }
+      .card .cap { padding: 0.5rem; font-size: 0.7rem; color: rgba(245,241,232,0.5); text-align: center; word-break: break-all; }
+      .count { text-align: center; color: rgba(245,241,232,0.6); font-size: 0.9rem; margin-top: 0.5rem; }
+      .hint { background: rgba(0,155,58,0.1); border: 1px solid rgba(0,155,58,0.25); border-radius: 8px; padding: 1rem; font-size: 0.85rem; line-height: 1.5; margin-top: 1.5rem; color: #9fe6b8; }
+    </style>
+  </head>
+  <body>
+    <div class="wm-wrap">
+      <div class="wm-head">
+        <a class="brand" href="index.html">PARALLEL<span class="slash">/</span>VISION</a>
+        <h1>Marca d'água</h1>
+        <p>Arraste as fotos originais, ajuste se quiser, e baixe os previews com marca d'água.<br/>Tudo acontece no seu navegador — nada é enviado para a internet.</p>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label for="wmText">Texto da marca</label>
+          <input type="text" id="wmText" value="PARALLEL VISION" />
+        </div>
+        <div>
+          <label for="wmOpacity">Opacidade: <span class="range-val" id="opacityVal">11%</span></label>
+          <input type="range" id="wmOpacity" min="3" max="40" value="11" />
+        </div>
+        <div>
+          <label for="wmAngle">Inclinação: <span class="range-val" id="angleVal">30°</span></label>
+          <input type="range" id="wmAngle" min="0" max="60" value="30" />
+        </div>
+        <div>
+          <label for="wmSize">Tamanho do texto: <span class="range-val" id="sizeVal">28</span></label>
+          <input type="range" id="wmSize" min="14" max="60" value="28" />
+        </div>
+      </div>
+
+      <div class="drop" id="drop">
+        <div class="big">📁 Arraste suas fotos aqui</div>
+        <div class="small">ou clique para escolher · JPG, PNG · pode soltar várias de uma vez</div>
+        <input type="file" id="fileInput" accept="image/*" multiple hidden />
+      </div>
+
+      <div class="actions" id="actions" style="display:none">
+        <button class="btn-wm" id="btnBaixarTodas">⬇ Baixar todas com marca</button>
+        <button class="btn-ghost2" id="btnLimpar">Limpar</button>
+      </div>
+      <div class="count" id="count"></div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="hint" id="hint" style="display:none">
+        <strong>Pronto!</strong> Baixe as fotos com marca d'água e suba para a pasta
+        <code>img/</code> do site (são os previews). As fotos <strong>originais limpas</strong>
+        você sobe para o Supabase. Veja o <code>GUIA-VENDA-FOTOS.md</code>.
+      </div>
+    </div>
+
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const drop = $("#drop"), fileInput = $("#fileInput"), grid = $("#grid");
+      let arquivos = [];
+
+      // sincroniza labels dos ranges
+      const sync = () => {
+        $("#opacityVal").textContent = $("#wmOpacity").value + "%";
+        $("#angleVal").textContent = $("#wmAngle").value + "°";
+        $("#sizeVal").textContent = $("#wmSize").value;
+      };
+      ["wmOpacity","wmAngle","wmSize"].forEach((id) => $("#"+id).addEventListener("input", () => { sync(); reprocessar(); }));
+      $("#wmText").addEventListener("input", reprocessar);
+      sync();
+
+      // drag & drop
+      drop.addEventListener("click", () => fileInput.click());
+      drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+      drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault(); drop.classList.remove("over");
+        handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
+
+      function handleFiles(fileList) {
+        const novos = [...fileList].filter((f) => f.type.startsWith("image/"));
+        arquivos = arquivos.concat(novos);
+        reprocessar();
+      }
+
+      function aplicarMarca(img, nome) {
+        const canvas = document.createElement("canvas");
+        // limita a 1600px no maior lado (otimização)
+        let { width: w, height: h } = img;
+        const max = Math.max(w, h);
+        if (max > 1600) { const s = 1600 / max; w = Math.round(w*s); h = Math.round(h*s); }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const texto = $("#wmText").value || "PARALLEL VISION";
+        const opacidade = (+$("#wmOpacity").value) / 100;
+        const angulo = (+$("#wmAngle").value) * Math.PI / 180;
+        const fsize = Math.max(Math.round(w * (+$("#wmSize").value) / 1000), 12);
+
+        ctx.save();
+        ctx.globalAlpha = opacidade;
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${fsize}px sans-serif`;
+        ctx.translate(w/2, h/2);
+        ctx.rotate(angulo);
+        const stepX = Math.round(w * 0.5);
+        const stepY = Math.round(h * 0.32);
+        for (let y = -h; y < h; y += stepY) {
+          for (let x = -w; x < w; x += stepX) {
+            ctx.fillText(texto, x, y);
+          }
+        }
+        ctx.restore();
+        return canvas.toDataURL("image/jpeg", 0.85);
+      }
+
+      function reprocessar() {
+        if (!arquivos.length) return;
+        grid.innerHTML = "";
+        $("#actions").style.display = "flex";
+        $("#hint").style.display = "block";
+        $("#count").textContent = `${arquivos.length} foto(s)`;
+        arquivos.forEach((file, i) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const dataUrl = aplicarMarca(img, file.name);
+              const card = document.createElement("div");
+              card.className = "card";
+              card.innerHTML = `<img src="${dataUrl}" data-url="${dataUrl}" data-nome="foto_${i+1}.jpeg" /><div class="cap">foto_${i+1}.jpeg</div>`;
+              grid.appendChild(card);
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      $("#btnBaixarTodas").addEventListener("click", () => {
+        const imgs = grid.querySelectorAll("img[data-url]");
+        imgs.forEach((im, i) => {
+          setTimeout(() => {
+            const a = document.createElement("a");
+            a.href = im.dataset.url;
+            a.download = im.dataset.nome;
+            document.body.appendChild(a); a.click(); a.remove();
+          }, i * 300); // espaça os downloads pro navegador não bloquear
+        });
+      });
+
+      $("#btnLimpar").addEventListener("click", () => {
+        arquivos = []; grid.innerHTML = "";
+        $("#actions").style.display = "none";
+        $("#hint").style.display = "none";
+        $("#count").textContent = "";
+        fileInput.value = "";
+      });
+    </script>
+  </body>
+</html>

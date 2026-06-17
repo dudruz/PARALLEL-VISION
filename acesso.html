@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Suas fotos — Parallel Vision</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { background: var(--black); color: var(--bone); min-height: 100vh; }
+      .acc-wrap { max-width: 760px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+      .acc-head { text-align: center; margin-bottom: 2.5rem; }
+      .acc-head .brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.05em; }
+      .acc-head .brand .slash { color: var(--burnt); }
+      .acc-head h1 { font-family: var(--font-display); font-size: 2.4rem; margin-top: 1.5rem; }
+      .acc-head p { color: rgba(245,241,232,0.6); margin-top: 0.5rem; }
+      .field { max-width: 420px; margin: 0 auto 1.3rem; }
+      .field label { display: block; font-size: 0.75rem; letter-spacing: var(--mega); text-transform: uppercase; color: rgba(245,241,232,0.5); margin-bottom: 0.5rem; }
+      .field input { width: 100%; background: var(--charcoal); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.9rem; font-size: 1rem; border-radius: 4px; }
+      .field select { width: 100%; background: var(--charcoal); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.9rem; font-size: 1rem; border-radius: 4px; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FF6B2D' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; }
+      .field select option { background: var(--charcoal); color: var(--bone); }
+      .btn-acc { display: block; margin: 1.2rem auto 0; background: var(--burnt); color: #000; border: none; padding: 0.9rem 2rem; font-size: 0.8rem; letter-spacing: var(--mega); text-transform: uppercase; cursor: pointer; border-radius: 4px; font-weight: 600; }
+      .btn-acc:hover { background: var(--amber); }
+      .msg { padding: 1rem; border-radius: 6px; margin: 1.5rem auto; max-width: 520px; font-size: 0.9rem; line-height: 1.5; text-align: center; }
+      .msg.err { background: rgba(255,60,56,0.15); color: #ff9b9b; }
+      .msg.ok { background: rgba(0,155,58,0.15); color: #7ee2a0; }
+      .msg.info { background: rgba(255,179,71,0.12); color: var(--amber); }
+      .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 0.8rem; margin-top: 2rem; }
+      .gal figure { position: relative; border-radius: 6px; overflow: hidden; background: var(--charcoal); }
+      .gal img { width: 100%; display: block; aspect-ratio: 2/3; object-fit: cover; }
+      .gal .dl { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0.6rem; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%); opacity: 0; transition: opacity 0.3s; }
+      .gal figure:hover .dl { opacity: 1; }
+      .gal .dl button { background: var(--bone); color: #000; border: none; padding: 0.4rem 0.8rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; border-radius: 4px; cursor: pointer; font-weight: 600; }
+      .prazo { text-align: center; font-size: 0.85rem; color: rgba(245,241,232,0.5); margin-top: 1rem; }
+      .pack-btn { display:block; margin: 1.5rem auto 0; background: linear-gradient(135deg, var(--burnt), var(--amber)); color:#000; border:none; padding: 1rem 2rem; font-size: 0.85rem; letter-spacing: var(--mega); text-transform: uppercase; cursor:pointer; border-radius: 6px; font-weight:700; }
+      .gal-ola { font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--bone); text-align: center; margin-bottom: 0.5rem; }
+      .gal-sub { text-align: center; color: rgba(245,241,232,0.65); margin-bottom: 1rem; font-size: 1rem; }
+      .gal-sub strong { color: var(--amber); }
+    </style>
+  </head>
+  <body>
+    <div class="acc-wrap">
+      <div class="acc-head">
+        <a class="brand" href="index.html">PARALLEL<span class="slash">/</span>VISION</a>
+        <h1>Suas fotos</h1>
+        <p>Digite o e-mail que você usou no pedido para acessar seu download.</p>
+      </div>
+
+      <div id="formView">
+        <div id="accMsg"></div>
+        <div class="field">
+          <label for="accEmail">Seu e-mail</label>
+          <input type="email" id="accEmail" placeholder="seu@email.com" />
+        </div>
+        <div class="field">
+          <label for="accCodigo">Código de acesso</label>
+          <input type="text" id="accCodigo" placeholder="PV-XXXX-XXXX" style="text-transform:uppercase" />
+        </div>
+        <div class="field" id="eventoField" style="display:none">
+          <label for="accEvento">Evento</label>
+          <select id="accEvento"></select>
+        </div>
+        <button class="btn-acc" id="btnAcc">Acessar minhas fotos</button>
+      </div>
+
+      <div id="galView" style="display:none">
+        <div id="galSaudacao"></div>
+        <div class="prazo" id="prazoInfo"></div>
+        <div id="galMsg"></div>
+        <button class="pack-btn" id="btnPack" style="display:none">⬇ Baixar pack completo</button>
+        <div class="gal" id="galGrid"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="venda.js"></script>
+    <script src="ensaios-data.js"></script>
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const params = new URLSearchParams(location.search);
+      const eventoQS = params.get("evento") || "";
+      const emailQS = params.get("email") || "";
+      const codigoQS = params.get("codigo") || "";
+
+      if (emailQS) $("#accEmail").value = emailQS;
+      if (codigoQS) $("#accCodigo").value = codigoQS;
+
+      // Preenche o dropdown de eventos (só os que existem nos dados).
+      // Se o evento veio pela URL (link do e-mail), nem mostra o dropdown.
+      (function preencherEventos() {
+        if (eventoQS) return; // já sabemos o evento, não precisa escolher
+        const ensaios = window.ENSAIOS || {};
+        // só eventos pagos e públicos no dropdown (privados acessam por link direto)
+        const ids = Object.keys(ensaios).filter((id) => ensaios[id].venda && ensaios[id].venda.paid && !ensaios[id].venda.emailPermitido && !ensaios[id].venda.emailsPermitidos);
+        if (!ids.length) return;
+        const sel = $("#accEvento");
+        sel.innerHTML = `<option value="">Selecione o evento…</option>` +
+          ids.map((id) => `<option value="${id}">${ensaios[id].title}</option>`).join("");
+        $("#eventoField").style.display = "block";
+      })();
+
+      $("#btnAcc").addEventListener("click", acessar);
+
+      async function acessar() {
+        const email = $("#accEmail").value.trim();
+        const codigo = $("#accCodigo").value.trim();
+        // evento: o da URL OU o selecionado no dropdown
+        const evento = eventoQS || $("#accEvento").value || "";
+        $("#accMsg").innerHTML = "";
+        if (!email) { $("#accMsg").innerHTML = `<div class="msg err">Digite seu e-mail.</div>`; return; }
+        if (!codigo) { $("#accMsg").innerHTML = `<div class="msg err">Digite o código de acesso que você recebeu por e-mail.</div>`; return; }
+        if (!evento) { $("#accMsg").innerHTML = `<div class="msg err">Selecione o evento.</div>`; return; }
+        if ((window.PV_CONFIG||{}).SUPABASE_URL === "") {
+          $("#accMsg").innerHTML = `<div class="msg info">Sistema ainda não configurado.</div>`; return;
+        }
+        try {
+          const res = await window.PV_VENDA.verificarAcesso(email, evento, codigo);
+          if (!res.liberado) {
+            if (res.expirado) {
+              $("#accMsg").innerHTML = `<div class="msg info">Seu acesso expirou. Entre em contato para renovar.</div>`;
+            } else {
+              $("#accMsg").innerHTML = `<div class="msg err">E-mail ou código não conferem, ou o acesso ainda não foi liberado. Confira o código no e-mail que você recebeu.</div>`;
+            }
+            return;
+          }
+          mostrarGaleria(res, evento);
+        } catch (e) {
+          $("#accMsg").innerHTML = `<div class="msg err">${e.message}</div>`;
+        }
+      }
+
+      function mostrarGaleria(res, evento) {
+        $("#formView").style.display = "none";
+        $("#galView").style.display = "block";
+        const expira = new Date(res.expira_em);
+        const pedido = res.pedido;
+
+        // saudação personalizada com o nome do cliente
+        const primeiroNome = (pedido.nome || "").trim().split(" ")[0];
+        const dadosEv = (window.ENSAIOS || {})[evento];
+        const tituloEv = dadosEv ? dadosEv.title : evento;
+        $("#galSaudacao").innerHTML = primeiroNome
+          ? `<h2 class="gal-ola">Obrigado, ${primeiroNome}! 📸</h2>
+             <p class="gal-sub">Suas fotos de <strong>${tituloEv}</strong> estão prontas. Aproveite!</p>`
+          : `<h2 class="gal-ola">Suas fotos estão prontas! 📸</h2>
+             <p class="gal-sub">Evento: <strong>${tituloEv}</strong>. Aproveite!</p>`;
+
+        $("#prazoInfo").textContent = `Acesso válido até ${expira.toLocaleString("pt-BR")}.`;
+
+        const dados = dadosEv;
+        const galeria = dados ? dados.gallery : [];
+        // pack
+        if (pedido.tipo === "pack") {
+          $("#btnPack").style.display = "block";
+          $("#btnPack").onclick = (ev) => baixar(`${evento}/pack.zip`, `${evento}-pack.zip`, ev.currentTarget);
+        }
+
+        // Monta a lista de fotos a exibir.
+        // No Supabase, as fotos seguem o padrão: evento/foto_1.jpeg, foto_2.jpeg...
+        // (a posição N corresponde à ordem da galeria do evento).
+        let itens = [];
+        if (pedido.tipo === "pack") {
+          // todas as fotos da galeria
+          itens = galeria.map((previewSrc, i) => ({
+            preview: previewSrc,
+            arquivo: `${evento}/foto_${i + 1}.jpeg`,
+            nome: `${evento}_foto_${i + 1}.jpeg`,
+          }));
+        } else {
+          // só as fotos que o cliente pediu (números guardados em pedido.fotos)
+          (pedido.fotos || []).forEach((ref) => {
+            // ref pode ser "5" ou "evento_5.jpeg" — extrai o número
+            const n = parseInt(String(ref).replace(/\D/g, ""), 10);
+            if (!n || n < 1 || n > galeria.length) return;
+            itens.push({
+              preview: galeria[n - 1],
+              arquivo: `${evento}/foto_${n}.jpeg`,
+              nome: `${evento}_foto_${n}.jpeg`,
+            });
+          });
+        }
+
+        const grid = $("#galGrid");
+        grid.innerHTML = itens.map((it) => `
+          <figure>
+            <img src="${it.preview}" alt="${it.nome}" loading="lazy" onerror="this.style.opacity=0.3" />
+            <div class="dl"><button data-foto="${it.arquivo}" data-nome="${it.nome}">⬇ Baixar</button></div>
+          </figure>`).join("");
+        grid.querySelectorAll("[data-foto]").forEach((b) =>
+          b.addEventListener("click", () => baixar(b.dataset.foto, b.dataset.nome, b)));
+      }
+
+      async function baixar(caminho, nomeArquivo, btn) {
+        const txtOriginal = btn ? btn.textContent : "";
+        if (btn) { btn.disabled = true; btn.textContent = "Baixando…"; }
+        try {
+          const url = await window.PV_VENDA.gerarLinkDownload(caminho);
+          // baixa a imagem como blob e força o download (evita abrir em nova aba)
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error("falha ao buscar arquivo");
+          const blob = await resp.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = nomeArquivo || "foto.jpeg";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+          if (btn) { btn.textContent = "✓ Baixado"; setTimeout(() => { btn.disabled = false; btn.textContent = txtOriginal; }, 2000); }
+        } catch (e) {
+          if (btn) { btn.disabled = false; btn.textContent = txtOriginal; }
+          $("#galMsg").innerHTML = `<div class="msg err">Não foi possível baixar esta foto. Se o problema persistir, fale com a gente pelo WhatsApp.</div>`;
+          setTimeout(() => { $("#galMsg").innerHTML = ""; }, 6000);
+        }
+      }
+
+      // se veio com email+evento na URL (do e-mail), tenta direto
+      // auto-tenta só se vier email + evento + código na URL (link do e-mail)
+      if (emailQS && eventoQS && codigoQS) { acessar(); }
+    </script>
+  </body>
+</html>

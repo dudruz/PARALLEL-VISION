@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Painel — Parallel Vision</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { background: var(--black); color: var(--bone); min-height: 100vh; }
+      .admin-wrap { max-width: 920px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+      .admin-head { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(245,241,232,0.15); margin-bottom: 2rem; }
+      .admin-head h1 { font-family: var(--font-display); font-size: 1.8rem; }
+      .login-box { max-width: 380px; margin: 6rem auto; }
+      .login-box h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 1.5rem; }
+      .field { margin-bottom: 1rem; }
+      .field label { display: block; font-size: 0.75rem; letter-spacing: var(--mega); text-transform: uppercase; color: rgba(245,241,232,0.5); margin-bottom: 0.4rem; }
+      .field input { width: 100%; background: var(--charcoal); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.8rem; font-size: 1rem; border-radius: 4px; }
+      .btn-admin { background: var(--burnt); color: #000; border: none; padding: 0.8rem 1.4rem; font-size: 0.8rem; letter-spacing: var(--mega); text-transform: uppercase; cursor: pointer; border-radius: 4px; font-weight: 600; }
+      .btn-admin:hover { background: var(--amber); }
+      .btn-ghost { background: transparent; border: 1px solid rgba(245,241,232,0.3); color: var(--bone); padding: 0.5rem 1rem; font-size: 0.7rem; letter-spacing: var(--mega); text-transform: uppercase; cursor: pointer; border-radius: 4px; }
+      .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+      .tab { background: var(--charcoal); border: 1px solid rgba(245,241,232,0.15); color: rgba(245,241,232,0.6); padding: 0.5rem 1rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; border-radius: 4px; }
+      .tab.active { background: var(--burnt); color: #000; border-color: var(--burnt); }
+      .pedido { background: var(--charcoal); border: 1px solid rgba(245,241,232,0.12); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; }
+      .pedido-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem; }
+      .pedido .email { font-weight: 600; }
+      .pedido .meta { font-size: 0.8rem; color: rgba(245,241,232,0.5); }
+      .pedido .fotos { font-size: 0.85rem; color: rgba(245,241,232,0.7); margin: 0.5rem 0; }
+      .pedido-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+      .badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.2rem 0.5rem; border-radius: 999px; }
+      .badge.pendente { background: rgba(255,179,71,0.2); color: var(--amber); }
+      .badge.liberado { background: rgba(0,155,58,0.2); color: #4ade80; }
+      .badge.negado { background: rgba(255,60,56,0.2); color: #ff6b6b; }
+      .msg { padding: 0.8rem; border-radius: 4px; margin: 1rem 0; font-size: 0.85rem; }
+      .msg.err { background: rgba(255,60,56,0.15); color: #ff9b9b; }
+      .msg.ok { background: rgba(0,155,58,0.15); color: #7ee2a0; }
+      .empty { text-align: center; padding: 3rem; color: rgba(245,241,232,0.4); }
+      .not-config { background: rgba(255,179,71,0.12); border: 1px solid rgba(255,179,71,0.3); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; font-size: 0.9rem; line-height: 1.6; }
+      /* gerador de evento dentro do admin */
+      .ce-field { margin-bottom: 1.2rem; }
+      .ce-field label { display: block; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,241,232,0.55); margin-bottom: 0.45rem; }
+      .ce-field input, .ce-field select, .ce-field textarea { width: 100%; background: var(--black); border: 1px solid rgba(245,241,232,0.2); color: var(--bone); padding: 0.8rem; border-radius: 6px; font-size: 0.95rem; font-family: inherit; box-sizing: border-box; }
+      .ce-field textarea { resize: vertical; min-height: 70px; }
+      .ce-field .hint { font-size: 0.75rem; color: rgba(245,241,232,0.4); margin-top: 0.35rem; }
+      .ce-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .ce-block { background: var(--charcoal); border: 1px solid rgba(245,241,232,0.12); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem; }
+      .ce-block h3 { font-size: 1rem; margin-bottom: 1.2rem; color: var(--bone); }
+      .ce-toggle { display: flex; gap: 0.5rem; }
+      .ce-toggle button { flex: 1; background: var(--black); border: 1px solid rgba(245,241,232,0.2); color: rgba(245,241,232,0.7); padding: 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+      .ce-toggle button.active { background: var(--burnt); color: #000; border-color: var(--burnt); font-weight: 600; }
+      .ce-gerar { width: 100%; background: var(--burnt); color: #000; border: none; padding: 1rem; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; border-radius: 8px; cursor: pointer; }
+      .ce-gerar:hover { background: var(--amber); }
+      .ce-code { background: #0c0c0c; border: 1px solid rgba(255,107,45,0.3); border-radius: 8px; padding: 1.2rem; font-family: ui-monospace, monospace; font-size: 0.8rem; color: #e8e0d0; white-space: pre; overflow-x: auto; line-height: 1.5; }
+      .ce-copy { background: var(--amber); color: #000; border: none; padding: 0.7rem 1.4rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; margin-top: 0.8rem; }
+      .ce-steps { background: rgba(255,179,71,0.08); border: 1px solid rgba(255,179,71,0.25); border-radius: 8px; padding: 1.3rem 1.5rem; margin-top: 1rem; }
+      .ce-steps ol { margin: 0; padding-left: 1.3rem; }
+      .ce-steps li { margin-bottom: 0.6rem; line-height: 1.55; color: rgba(245,241,232,0.8); font-size: 0.9rem; }
+      .ce-steps code { background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.82rem; color: var(--amber); }
+      @media (max-width: 560px) { .ce-row { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN -->
+    <div id="loginView" class="login-box" style="display:none">
+      <h2>Painel Parallel Vision</h2>
+      <div id="loginMsg"></div>
+      <div class="field">
+        <label for="admEmail">E-mail</label>
+        <input type="email" id="admEmail" placeholder="seu@email.com" />
+      </div>
+      <div class="field">
+        <label for="admPass">Senha</label>
+        <input type="password" id="admPass" />
+      </div>
+      <button class="btn-admin" id="btnLogin">Entrar</button>
+    </div>
+
+    <!-- PAINEL -->
+    <div id="panelView" class="admin-wrap" style="display:none">
+      <div class="admin-head">
+        <h1>Painel</h1>
+        <button class="btn-ghost" id="btnLogout">Sair</button>
+      </div>
+
+      <!-- navegação principal -->
+      <div class="tabs" style="margin-bottom:2rem">
+        <button class="tab active" data-sec="pedidos">📋 Pedidos</button>
+        <button class="tab" data-sec="criar">+ Criar evento</button>
+      </div>
+
+      <!-- SEÇÃO PEDIDOS -->
+      <div id="secPedidos">
+        <div id="panelMsg"></div>
+        <div class="tabs">
+          <button class="tab active" data-status="pendente">Pendentes</button>
+          <button class="tab" data-status="liberado">Liberados</button>
+          <button class="tab" data-status="negado">Negados</button>
+        </div>
+        <div id="pedidosList"></div>
+      </div>
+
+      <!-- SEÇÃO CRIAR EVENTO -->
+      <div id="secCriar" style="display:none"></div>
+    </div>
+
+    <!-- NÃO CONFIGURADO -->
+    <div id="configView" class="admin-wrap" style="display:none">
+      <div class="not-config">
+        <strong>Sistema de venda ainda não configurado.</strong><br/>
+        Cole suas chaves do Supabase no arquivo <code>config.js</code> e siga o
+        <code>GUIA-VENDA-FOTOS.md</code>. Depois recarregue esta página.
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="config.js"></script>
+    <script src="venda.js"></script>
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const show = (id) => {
+        ["loginView","panelView","configView"].forEach((v) =>
+          ($("#"+v).style.display = v === id ? "block" : "none"));
+      };
+
+      function notConfigured() {
+        const c = window.PV_CONFIG || {};
+        return !c.SUPABASE_URL || !c.SUPABASE_ANON_KEY;
+      }
+
+      async function boot() {
+        if (notConfigured()) { show("configView"); return; }
+        const sb = window.PV_VENDA.getSupabase();
+        if (!sb) { show("configView"); return; } // SDK não carregou
+        const { data } = await sb.auth.getSession();
+        if (data && data.session) { show("panelView"); carregar("pendente"); }
+        else show("loginView");
+      }
+
+      // LOGIN
+      $("#btnLogin").addEventListener("click", async () => {
+        const email = $("#admEmail").value.trim();
+        const pass = $("#admPass").value;
+        const sb = window.PV_VENDA.getSupabase();
+        $("#loginMsg").innerHTML = "";
+        const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if (error) {
+          $("#loginMsg").innerHTML = `<div class="msg err">${error.message}</div>`;
+        } else {
+          show("panelView"); carregar("pendente");
+        }
+      });
+
+      $("#btnLogout").addEventListener("click", async () => {
+        const sb = window.PV_VENDA.getSupabase();
+        await sb.auth.signOut();
+        show("loginView");
+      });
+
+      // NAVEGAÇÃO PRINCIPAL (Pedidos / Criar evento)
+      document.querySelectorAll("[data-sec]").forEach((t) =>
+        t.addEventListener("click", () => {
+          document.querySelectorAll("[data-sec]").forEach((x) => x.classList.remove("active"));
+          t.classList.add("active");
+          const sec = t.dataset.sec;
+          $("#secPedidos").style.display = sec === "pedidos" ? "block" : "none";
+          $("#secCriar").style.display = sec === "criar" ? "block" : "none";
+          if (sec === "criar") montarCriarEvento();
+        }));
+
+      // ABAS DE STATUS dos pedidos (Pendentes/Liberados/Negados)
+      document.querySelectorAll("[data-status]").forEach((t) =>
+        t.addEventListener("click", () => {
+          document.querySelectorAll("[data-status]").forEach((x) => x.classList.remove("active"));
+          t.classList.add("active");
+          carregar(t.dataset.status);
+        }));
+
+      let pedidosCarregados = [];
+
+      async function carregar(status) {
+        const list = $("#pedidosList");
+        list.innerHTML = `<div class="empty">Carregando…</div>`;
+        try {
+          pedidosCarregados = await window.PV_VENDA.listarPedidos(status);
+          if (!pedidosCarregados.length) { list.innerHTML = `<div class="empty">Nenhum pedido ${status}.</div>`; return; }
+          list.innerHTML = pedidosCarregados.map(renderPedido).join("");
+          wireActions();
+        } catch (e) {
+          list.innerHTML = `<div class="msg err">${e.message}</div>`;
+        }
+      }
+
+      function renderPedido(p) {
+        const data = new Date(p.criado_em).toLocaleString("pt-BR");
+        const fotos = p.tipo === "pack" ? "Pack completo" : `${(p.fotos||[]).length} foto(s): ${(p.fotos||[]).join(", ")}`;
+        const acoes = p.status === "pendente"
+          ? `<div class="pedido-actions">
+               <button class="btn-admin" data-libera="${p.id}">Liberar</button>
+               <button class="btn-ghost" data-nega="${p.id}">Negar</button>
+             </div>` : "";
+        return `<div class="pedido" data-id="${p.id}">
+          <div class="pedido-top">
+            <span class="email">${p.email}</span>
+            <span class="badge ${p.status}">${p.status}</span>
+          </div>
+          <div class="meta">${p.nome ? p.nome + " · " : ""}Evento: <strong>${p.evento}</strong> · ${data}</div>
+          ${p.codigo ? `<div class="meta">Código: <strong style="color:var(--amber)">${p.codigo}</strong></div>` : ""}
+          <div class="fotos">${fotos}</div>
+          ${acoes}
+        </div>`;
+      }
+
+      function wireActions() {
+        document.querySelectorAll("[data-libera]").forEach((b) =>
+          b.addEventListener("click", async () => {
+            b.disabled = true; b.textContent = "Liberando…";
+            const id = b.getAttribute("data-libera");
+            const pedido = pedidosCarregados.find((x) => String(x.id) === String(id));
+            try {
+              const r = await window.PV_VENDA.liberarPedido(pedido);
+              const cod = r && r.codigo ? r.codigo : "";
+              $("#panelMsg").innerHTML = `<div class="msg ok">Pedido de ${pedido.email} liberado!<br/>Código de acesso: <strong style="font-size:1.1rem;color:var(--amber)">${cod}</strong><br/>${(window.PV_CONFIG||{}).EMAILJS_SERVICE_ID ? "E-mail enviado com o código." : "Envie este código ao cliente pelo WhatsApp."}</div>`;
+              carregar("pendente");
+            } catch (e) {
+              $("#panelMsg").innerHTML = `<div class="msg err">${e.message}</div>`;
+              b.disabled = false; b.textContent = "Liberar";
+            }
+          }));
+        document.querySelectorAll("[data-nega]").forEach((b) =>
+          b.addEventListener("click", async () => {
+            if (!confirm("Negar este pedido?")) return;
+            const id = b.getAttribute("data-nega");
+            const pedido = pedidosCarregados.find((x) => String(x.id) === String(id));
+            try {
+              await window.PV_VENDA.negarPedido(pedido);
+              carregar("pendente");
+            } catch (e) {
+              $("#panelMsg").innerHTML = `<div class="msg err">${e.message}</div>`;
+            }
+          }));
+      }
+
+      // ===== GERADOR DE EVENTO (dentro do admin) =====
+      let criarMontado = false;
+      function montarCriarEvento() {
+        if (criarMontado) return;
+        criarMontado = true;
+        $("#secCriar").innerHTML = `
+          <div class="ce-block">
+            <h3>1 · Informações do evento</h3>
+            <div class="ce-field">
+              <label>Nome do evento</label>
+              <input type="text" id="f_title" placeholder="Ex: Aniversário da Maria" />
+            </div>
+            <div class="ce-field">
+              <label>ID do evento (sem espaços, sem acento)</label>
+              <input type="text" id="f_id" placeholder="ex: aniversario_maria" />
+              <div class="hint">Gerado automático a partir do nome. Use só letras minúsculas, números e _</div>
+            </div>
+            <div class="ce-row">
+              <div class="ce-field"><label>Subtítulo (data · local)</label><input type="text" id="f_sub" placeholder="Jan 2026 · Belo Horizonte" /></div>
+              <div class="ce-field"><label>Quantas fotos</label><input type="number" id="f_qtd" min="1" max="200" value="10" /></div>
+            </div>
+            <div class="ce-field"><label>Descrição curta</label><textarea id="f_intro" placeholder="Uma frase sobre o evento."></textarea></div>
+          </div>
+
+          <div class="ce-block">
+            <h3>2 · Preços</h3>
+            <div class="ce-row">
+              <div class="ce-field"><label>Foto avulsa</label><input type="text" id="f_precoFoto" value="R$ 15" /></div>
+              <div class="ce-field"><label>Pack completo</label><input type="text" id="f_precoPack" value="R$ 100" /></div>
+            </div>
+          </div>
+
+          <div class="ce-block">
+            <h3>3 · Quem pode acessar</h3>
+            <div class="ce-field">
+              <label>Tipo de evento</label>
+              <div class="ce-toggle">
+                <button type="button" id="t_publico" class="active">Público (loja)</button>
+                <button type="button" id="t_privado">Privado (só convidados)</button>
+              </div>
+              <div class="hint" id="tipoHint">Público: aparece na loja, qualquer um compra.</div>
+            </div>
+            <div class="ce-field" id="emailsField" style="display:none">
+              <label>E-mails autorizados (um por linha)</label>
+              <textarea id="f_emails" placeholder="maria@email.com&#10;joao@email.com" rows="4"></textarea>
+              <div class="hint">Só estes e-mails verão e poderão comprar. Fica fora da loja.</div>
+            </div>
+          </div>
+
+          <button class="ce-gerar" id="ceGerar">Gerar código do evento</button>
+
+          <div id="ceSaida" style="display:none">
+            <div class="ce-block" style="margin-top:1.2rem">
+              <h3>✓ Código do evento</h3>
+              <p style="color:rgba(245,241,232,0.6);font-size:0.9rem;margin-bottom:1rem">Copie e cole dentro do arquivo <code style="color:var(--amber)">ensaios-data.js</code>, logo após <code style="color:var(--amber)">window.ENSAIOS = {</code></p>
+              <div class="ce-code" id="ceCodeOut"></div>
+              <button class="ce-copy" id="ceCopy">📋 Copiar código</button>
+              <div class="ce-steps">
+                <strong style="display:block;margin-bottom:0.8rem;color:var(--amber)">📸 Suba as fotos no Supabase:</strong>
+                <ol id="ceStepsOut"></ol>
+              </div>
+            </div>
+          </div>`;
+
+        // lógica do gerador
+        let tipoEv = "publico";
+        const fId = $("#f_id"), fTitle = $("#f_title");
+        fTitle.addEventListener("input", () => {
+          if (fId.dataset.edited) return;
+          fId.value = fTitle.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+        });
+        fId.addEventListener("input", () => { fId.dataset.edited = "1"; });
+
+        $("#t_publico").addEventListener("click", () => setTipoEv("publico"));
+        $("#t_privado").addEventListener("click", () => setTipoEv("privado"));
+        function setTipoEv(t) {
+          tipoEv = t;
+          $("#t_publico").classList.toggle("active", t === "publico");
+          $("#t_privado").classList.toggle("active", t === "privado");
+          $("#emailsField").style.display = t === "privado" ? "block" : "none";
+          $("#tipoHint").textContent = t === "publico"
+            ? "Público: aparece na loja, qualquer um compra."
+            : "Privado: fora da loja, só os e-mails da lista acessam (você manda o link).";
+        }
+
+        $("#ceGerar").addEventListener("click", () => {
+          const id = (fId.value || "evento").trim();
+          const title = (fTitle.value || "EVENTO").trim();
+          const sub = ($("#f_sub").value || "2026 · Belo Horizonte").trim();
+          const intro = ($("#f_intro").value || "Cobertura do evento.").trim();
+          const qtd = parseInt($("#f_qtd").value, 10) || 10;
+          const precoFoto = ($("#f_precoFoto").value || "R$ 15").trim();
+          const precoPack = ($("#f_precoPack").value || "R$ 100").trim();
+          const gallery = [];
+          for (let i = 1; i <= qtd; i++) gallery.push(`"img/${id}_${i}.jpeg"`);
+
+          let vendaExtra = "";
+          if (tipoEv === "privado") {
+            const emails = ($("#f_emails").value || "").split("\n").map((x) => x.trim()).filter(Boolean);
+            const emailsStr = emails.map((e) => `"${e}"`).join(", ");
+            vendaExtra = `\n      emailsPermitidos: [${emailsStr}],  // SÓ estes e-mails acessam`;
+          }
+
+          const code = `  ${id}: {
+    id: "${id}",
+    num: "${tipoEv === "privado" ? "P" : "E"}",
+    theme: "amber",
+    layout: "amber",
+    title: "${title}",
+    subtitle: "${sub}",
+    cover: "img/${id}_1.jpeg",
+    intro: "${intro}",
+    body: ["${intro}"],
+    specs: {
+      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+      iso: "100–200", shutter: "1/320 – 1/500s",
+      flash: "Flash direto", local: "Belo Horizonte — MG", ano: "2026",
+    },
+    gallery: [${gallery.join(",")}],
+    venda: {
+      paid: true,
+      precoPack: "${precoPack}",
+      precoFoto: "${precoFoto}",${vendaExtra}
+      whatsapp: "5531983440061",
+    },
+  },`;
+          $("#ceCodeOut").textContent = code;
+
+          const steps = [
+            `No Supabase → Storage → bucket <code>fotos-pagas</code>, crie a pasta <code>${id}</code>`,
+            `Suba as fotos ORIGINAIS com os nomes: <code>foto_1.jpeg</code> … <code>foto_${qtd}.jpeg</code>`,
+            `Coloque os previews na pasta <code>img/</code> do site: <code>${id}_1.jpeg</code> … <code>${id}_${qtd}.jpeg</code>`,
+            `(Opcional) Suba o pack <code>${id}/pack.zip</code> no bucket`,
+            tipoEv === "privado"
+              ? `Mande o link para os convidados: <code>ensaio.html?id=${id}</code>`
+              : `Pronto! O evento já aparece na loja.`,
+          ];
+          $("#ceStepsOut").innerHTML = steps.map((s) => `<li>${s}</li>`).join("");
+          $("#ceSaida").style.display = "block";
+          $("#ceSaida").scrollIntoView({ behavior: "smooth" });
+        });
+
+        $("#ceCopy").addEventListener("click", () => {
+          navigator.clipboard.writeText($("#ceCodeOut").textContent).then(() => {
+            const b = $("#ceCopy"); b.textContent = "✓ Copiado!";
+            setTimeout(() => { b.textContent = "📋 Copiar código"; }, 2000);
+          });
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", boot);
+    </script>
+  </body>
+</html>
