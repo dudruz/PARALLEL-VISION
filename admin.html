@@ -447,52 +447,114 @@
         }
       }
 
-      // ===== GERADOR DE LINKS (pra mandar pros clientes) =====
+      // ===== GERADOR DE LINKS + BUSCA + DELETAR =====
       let linksMontado = false;
+      let eventosCache = {};   // todos os eventos carregados
+      let idsNoBanco = new Set(); // quais vieram do banco (podem ser deletados)
+
       async function montarLinks() {
         if (linksMontado) return;
         linksMontado = true;
+        await recarregarEventosLinks();
+      }
+
+      async function recarregarEventosLinks() {
         // carrega eventos do banco (com fallback)
         try {
           if (window.PV_VENDA && window.PV_VENDA.carregarEventos) {
             await window.PV_VENDA.carregarEventos();
           }
         } catch (e) { console.warn(e); }
-        const ensaios = window.ENSAIOS || window.ENSAIOS_LOCAIS || {};
-        const base = location.origin + location.pathname.replace(/[^/]*$/, ""); // pasta atual
+        eventosCache = window.ENSAIOS || window.ENSAIOS_LOCAIS || {};
 
-        const itens = Object.keys(ensaios).map((id) => {
-          const e = ensaios[id];
+        // descobre quais estão no banco (consultando direto)
+        idsNoBanco = new Set();
+        try {
+          const db = window.PV_VENDA.getSupabase();
+          if (db) {
+            const { data } = await db.from("eventos").select("id");
+            (data || []).forEach((r) => idsNoBanco.add(r.id));
+          }
+        } catch (e) { console.warn(e); }
+
+        $("#secLinks").innerHTML = `
+          <div style="margin-bottom:1.2rem">
+            <p style="color:rgba(245,241,232,0.6);font-size:0.92rem;margin-bottom:1rem">Copie o link de cada evento e mande pro cliente (WhatsApp, e-mail...). Eventos privados só abrem para os e-mails autorizados.</p>
+            <input type="text" id="buscaLink" placeholder="🔎 Buscar evento pelo nome..." style="width:100%;background:var(--black);border:1px solid rgba(245,241,232,.2);color:var(--bone);padding:0.8rem;border-radius:8px;font-size:0.95rem;box-sizing:border-box" />
+          </div>
+          <div id="listaLinks"></div>`;
+
+        $("#buscaLink").addEventListener("input", (ev) => renderListaLinks(ev.target.value));
+        renderListaLinks("");
+      }
+
+      function renderListaLinks(filtro) {
+        const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+        const termo = (filtro || "").toLowerCase().trim();
+        const ids = Object.keys(eventosCache).filter((id) => {
+          const e = eventosCache[id];
+          return !termo || (e.title || "").toLowerCase().includes(termo) || id.toLowerCase().includes(termo);
+        });
+
+        if (!ids.length) {
+          $("#listaLinks").innerHTML = `<div class="ce-block">Nenhum evento encontrado${termo ? ` para "${termo}"` : ""}.</div>`;
+          return;
+        }
+
+        $("#listaLinks").innerHTML = ids.map((id) => {
+          const e = eventosCache[id];
           const pago = e.venda && e.venda.paid;
           const privado = e.venda && (e.venda.emailPermitido || e.venda.emailsPermitidos);
+          const noBanco = idsNoBanco.has(id);
           const linkEvento = `${base}ensaio.html?id=${id}`;
-          const linkLoja = `${base}loja.html`;
           let tag = "Grátis";
           if (privado) tag = "🔒 Privado";
           else if (pago) tag = "💰 Pago (na loja)";
           return `
-            <div class="ce-block" style="margin-bottom:1rem">
-              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">
+            <div class="ce-block" style="margin-bottom:1rem" data-evento="${id}">
+              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;flex-wrap:wrap">
                 <strong style="font-size:1rem">${e.title}</strong>
                 <span style="font-size:0.7rem;background:var(--black);padding:0.2rem 0.6rem;border-radius:999px;color:var(--amber)">${tag}</span>
+                ${noBanco
+                  ? `<button class="btn-ghost" style="margin-left:auto;padding:0.3rem 0.8rem;font-size:0.75rem;color:#ff6b6b;border-color:#ff6b6b55" onclick="deletarEvento('${id}', '${(e.title || "").replace(/'/g, "")}')">🗑️ Deletar</button>`
+                  : `<span style="margin-left:auto;font-size:0.7rem;color:rgba(245,241,232,.4)">fixo (no código)</span>`}
               </div>
-              <div class="ce-field" style="margin-bottom:0.5rem">
+              <div class="ce-field" style="margin-bottom:0.3rem">
                 <label>Link do evento (mandar pro cliente)</label>
                 <div style="display:flex;gap:0.5rem">
                   <input type="text" readonly value="${linkEvento}" id="lk_${id}" style="flex:1" />
                   <button class="ce-copy" style="margin:0;white-space:nowrap" onclick="copiarLink('lk_${id}', this)">📋 Copiar</button>
                 </div>
               </div>
-              ${privado ? `<div class="hint" style="color:var(--amber)">⚠️ Privado: só os e-mails autorizados conseguem comprar. Mande este link só para os convidados.</div>` : ""}
+              ${privado ? `<div class="hint" style="color:var(--amber)">⚠️ Privado: só os e-mails autorizados conseguem comprar.</div>` : ""}
             </div>`;
         }).join("");
-
-        $("#secLinks").innerHTML = `
-          <div style="margin-bottom:1.5rem">
-            <p style="color:rgba(245,241,232,0.6);font-size:0.92rem">Copie o link de cada evento e mande pro cliente (WhatsApp, e-mail...). Eventos privados só abrem para os e-mails autorizados.</p>
-          </div>
-          ${itens || '<div class="ce-block">Nenhum evento ainda. Crie um na aba "Criar evento".</div>'}`;
       }
+
+      // deletar evento (banco + fotos do storage)
+      window.deletarEvento = async function (id, titulo) {
+        if (!confirm(`Tem certeza que quer apagar o evento "${titulo}"?\n\nIsso remove o evento e TODAS as fotos dele. Não dá pra desfazer.`)) return;
+        const db = window.PV_VENDA.getSupabase();
+        if (!db) { alert("Supabase não disponível."); return; }
+        const card = document.querySelector(`[data-evento="${id}"]`);
+        if (card) card.style.opacity = "0.5";
+        try {
+          // 1) apaga as fotos do storage (pasta do evento no bucket eventos-fotos)
+          const { data: arquivos } = await db.storage.from("eventos-fotos").list(id);
+          if (arquivos && arquivos.length) {
+            const caminhos = arquivos.map((a) => `${id}/${a.name}`);
+            await db.storage.from("eventos-fotos").remove(caminhos);
+          }
+          // 2) apaga o evento do banco
+          const { error } = await db.from("eventos").delete().eq("id", id);
+          if (error) throw error;
+          // 3) atualiza a lista
+          await recarregarEventosLinks();
+        } catch (err) {
+          if (card) card.style.opacity = "1";
+          alert("Não foi possível apagar: " + err.message);
+        }
+      };
 
       // copiar link (precisa estar global por causa do onclick)
       window.copiarLink = function (inputId, btn) {
