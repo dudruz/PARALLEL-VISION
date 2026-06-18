@@ -322,7 +322,15 @@ function initMotion() {
 }
 
 /* ---- boot ---- */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // carrega os eventos do banco (com fallback pros locais)
+  try {
+    if (window.PV_VENDA && window.PV_VENDA.carregarEventos) {
+      await window.PV_VENDA.carregarEventos();
+    }
+  } catch (err) { console.warn(err); }
+  if (!window.ENSAIOS) window.ENSAIOS = window.ENSAIOS_LOCAIS || {};
+
   const data = window.ENSAIOS || {};
   const e = data[getId()];
   if (!e) {

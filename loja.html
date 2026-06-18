@@ -59,34 +59,52 @@
       </p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <script src="ensaios-data.js"></script>
+    <script src="venda.js"></script>
     <script>
       const grid = document.getElementById("lojaGrid");
-      const ensaios = window.ENSAIOS || {};
-      // eventos pagos e PÚBLICOS (privados não aparecem na loja)
-      const pagos = Object.values(ensaios).filter((e) => e.venda && e.venda.paid && !e.venda.emailPermitido && !e.venda.emailsPermitidos);
 
-      if (!pagos.length) {
-        document.getElementById("lojaEmpty").style.display = "block";
-      } else {
-        grid.innerHTML = pagos.map((e) => `
-          <div class="evento-card">
-            <a href="ensaio.html?id=${e.id}" class="evento-thumb">
-              <img src="${e.cover}" alt="${e.title}" loading="lazy" />
-              <span class="badge">À venda</span>
-            </a>
-            <div class="evento-info">
-              <span class="sub">${e.subtitle || ""}</span>
-              <h2>${e.title}</h2>
-              <p class="desc">${e.intro || ""}</p>
-              <div class="evento-precos">
-                <div>Pack<strong>${e.venda.precoPack || "—"}</strong></div>
-                ${e.venda.precoFoto ? `<div>Avulsa<strong>${e.venda.precoFoto}</strong></div>` : ""}
+      function montarLoja() {
+        const ensaios = window.ENSAIOS || window.ENSAIOS_LOCAIS || {};
+        // eventos pagos e PÚBLICOS (privados não aparecem na loja)
+        const pagos = Object.values(ensaios).filter((e) => e.venda && e.venda.paid && !e.venda.emailPermitido && !e.venda.emailsPermitidos);
+
+        if (!pagos.length) {
+          document.getElementById("lojaEmpty").style.display = "block";
+          grid.innerHTML = "";
+        } else {
+          document.getElementById("lojaEmpty").style.display = "none";
+          grid.innerHTML = pagos.map((e) => `
+            <div class="evento-card">
+              <a href="ensaio.html?id=${e.id}" class="evento-thumb">
+                <img src="${e.cover}" alt="${e.title}" loading="lazy" />
+                <span class="badge">À venda</span>
+              </a>
+              <div class="evento-info">
+                <span class="sub">${e.subtitle || ""}</span>
+                <h2>${e.title}</h2>
+                <p class="desc">${e.intro || ""}</p>
+                <div class="evento-precos">
+                  <div>Pack<strong>${e.venda.precoPack || "—"}</strong></div>
+                  ${e.venda.precoFoto ? `<div>Avulsa<strong>${e.venda.precoFoto}</strong></div>` : ""}
+                </div>
+                <a href="ensaio.html?id=${e.id}" class="evento-btn">Ver fotos e comprar</a>
               </div>
-              <a href="ensaio.html?id=${e.id}" class="evento-btn">Ver fotos e comprar</a>
-            </div>
-          </div>`).join("");
+            </div>`).join("");
+        }
       }
+
+      // carrega eventos do banco e monta a loja
+      (async () => {
+        try {
+          if (window.PV_VENDA && window.PV_VENDA.carregarEventos) {
+            await window.PV_VENDA.carregarEventos();
+          }
+        } catch (e) { console.warn(e); }
+        montarLoja();
+      })();
     </script>
   </body>
 </html>

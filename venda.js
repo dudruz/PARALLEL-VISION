@@ -25,26 +25,74 @@
   }
 
   /* ============================================================
+     EVENTOS — carrega do banco (tabela eventos) e mescla com os
+     eventos do arquivo (ensaios-data.js) como fallback de segurança.
+     Eventos do banco têm prioridade. Banco fora do ar → usa só o arquivo.
+     ============================================================ */
+  async function carregarEventos() {
+    const doArquivo = window.ENSAIOS_LOCAIS || {}; // os do ensaios-data.js
+    let doBanco = {};
+    try {
+      const db = getSupabase();
+      if (db) {
+        const { data, error } = await db
+          .from("eventos")
+          .select("*")
+          .eq("publicado", true)
+          .order("ordem", { ascending: true });
+        if (!error && data) {
+          for (const linha of data) {
+            if (linha.dados) doBanco[linha.id] = linha.dados; // 'dados' = objeto completo
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Eventos do banco indisponíveis, usando os locais.", e);
+    }
+    // mescla: arquivo como base, banco sobrescreve/adiciona
+    const todos = { ...doArquivo, ...doBanco };
+    window.ENSAIOS = todos;
+    return todos;
+  }
+
+  /* ============================================================
      CLIENTE — cria um pedido de fotos
      payload: { email, nome, evento, tipo, fotos:[ids], total }
      ============================================================ */
   async function criarPedido(payload) {
     const db = getSupabase();
     if (!db) throw new Error("Sistema de venda ainda não configurado (Supabase).");
-    const { data, error } = await db
-      .from("pedidos")
-      .insert([{
-        email: payload.email.trim().toLowerCase(),
-        nome: payload.nome || "",
-        evento: payload.evento,
-        tipo: payload.tipo,           // "pack" ou "fotos"
-        fotos: payload.fotos || [],   // lista de nomes/ids
-        status: "pendente",
-        criado_em: new Date().toISOString(),
-      }])
-      .select();
-    if (error) throw error;
-    return data && data[0];
+    const registro = {
+      email: payload.email.trim().toLowerCase(),
+      nome: payload.nome || "",
+      evento: payload.evento,
+      tipo: payload.tipo,           // "pack" ou "fotos"
+      fotos: payload.fotos || [],   // lista de nomes/ids
+      status: "pendente",
+      criado_em: new Date().toISOString(),
+    };
+    // tenta inserir retornando a linha (precisa de policy SELECT p/ anon)
+    let { data, error } = await db.from("pedidos").insert([registro]).select();
+    if (error) {
+      // se o erro foi por causa do SELECT (RLS), tenta inserir SEM retornar
+      // e busca o pedido logo em seguida pelo email+evento mais recente
+      const insertOnly = await db.from("pedidos").insert([registro]);
+      if (insertOnly.error) throw insertOnly.error;
+      // busca o pedido recém-criado (pode falhar se não houver SELECT p/ anon, tudo bem)
+      try {
+        const busca = await db
+          .from("pedidos")
+          .select("*")
+          .eq("email", registro.email)
+          .eq("evento", registro.evento)
+          .order("criado_em", { ascending: false })
+          .limit(1);
+        data = busca.data;
+      } catch (_) {
+        data = null;
+      }
+    }
+    return data && data[0] ? data[0] : registro;
   }
 
   /* ============================================================
@@ -201,6 +249,7 @@
   window.PV_VENDA = {
     getSupabase,
     initEmail,
+    carregarEventos,
     criarPedido,
     verificarAcesso,
     gerarLinkDownload,

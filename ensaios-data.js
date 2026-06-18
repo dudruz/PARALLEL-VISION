@@ -1,9 +1,11 @@
 /* ============================================================
    PARALLEL VISION — ensaios-data.js
-   Dados de cada ensaio dedicado. Editável livremente.
-   layout: "amber" | "sport" | "night" | "copa"  -> molduras/animações distintas
+   Eventos LOCAIS (fallback). Os eventos "ao vivo" vêm do banco
+   (Supabase, tabela eventos). Estes aqui são a reserva de segurança
+   e os eventos originais cujas fotos estão no GitHub (pasta img/).
+   layout: "amber" | "sport" | "night" | "copa"
    ============================================================ */
-window.ENSAIOS = {
+window.ENSAIOS_LOCAIS = {
   /* ---------------- BLAYC (Copa / Brasil) ---------------- */
   blayc: {
     id: "blayc",
@@ -252,6 +254,7 @@ window.ENSAIOS = {
      - Você envia o LINK DIRETO para a pessoa:
          ensaio.html?id=fotos_eduardo
      ============================================================ */
+  /*
   fotos_eduardo: {
     id: "fotos_eduardo",
     num: "P1",
@@ -276,5 +279,6 @@ window.ENSAIOS = {
       whatsapp: "5531983440061",
     },
   },
+  */
 };
 

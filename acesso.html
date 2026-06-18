@@ -87,8 +87,14 @@
       if (codigoQS) $("#accCodigo").value = codigoQS;
 
       // Preenche o dropdown de eventos (só os que existem nos dados).
-      // Se o evento veio pela URL (link do e-mail), nem mostra o dropdown.
-      (function preencherEventos() {
+      // Carrega do banco primeiro (com fallback pros locais).
+      (async function preencherEventos() {
+        try {
+          if (window.PV_VENDA && window.PV_VENDA.carregarEventos) {
+            await window.PV_VENDA.carregarEventos();
+          }
+        } catch (e) { console.warn(e); }
+        if (!window.ENSAIOS) window.ENSAIOS = window.ENSAIOS_LOCAIS || {};
         if (eventoQS) return; // já sabemos o evento, não precisa escolher
         const ensaios = window.ENSAIOS || {};
         // só eventos pagos e públicos no dropdown (privados acessam por link direto)

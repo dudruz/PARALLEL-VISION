@@ -402,10 +402,16 @@
 
       // ===== GERADOR DE LINKS (pra mandar pros clientes) =====
       let linksMontado = false;
-      function montarLinks() {
+      async function montarLinks() {
         if (linksMontado) return;
         linksMontado = true;
-        const ensaios = window.ENSAIOS || {};
+        // carrega eventos do banco (com fallback)
+        try {
+          if (window.PV_VENDA && window.PV_VENDA.carregarEventos) {
+            await window.PV_VENDA.carregarEventos();
+          }
+        } catch (e) { console.warn(e); }
+        const ensaios = window.ENSAIOS || window.ENSAIOS_LOCAIS || {};
         const base = location.origin + location.pathname.replace(/admin\.html$/, "");
 
         const itens = Object.keys(ensaios).map((id) => {
