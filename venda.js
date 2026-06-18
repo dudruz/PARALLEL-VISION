@@ -68,6 +68,7 @@
       evento: payload.evento,
       tipo: payload.tipo,           // "pack" ou "fotos"
       fotos: payload.fotos || [],   // lista de nomes/ids
+      pagamento: payload.pagamento || "online", // "online" ou "dinheiro"
       status: "pendente",
       criado_em: new Date().toISOString(),
     };

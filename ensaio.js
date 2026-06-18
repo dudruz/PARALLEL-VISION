@@ -401,8 +401,10 @@ function abrirModalPedido(e) {
       </div>
 
       <div id="pmMsg"></div>
-      <button class="pm-enviar" id="pmEnviar">Enviar pedido</button>
-      <p class="pm-obs">Depois de confirmarmos o pagamento, você recebe um código de acesso por e-mail.</p>
+      <p class="pm-pagamento-label">Como você quer pagar?</p>
+      <button class="pm-enviar" id="pmPagarOnline">💳 Pagar online (Pix ou cartão)</button>
+      <button class="pm-enviar pm-dinheiro" id="pmPagarDinheiro">💵 Paguei em dinheiro no evento</button>
+      <p class="pm-obs">No pagamento online, o código chega na hora por e-mail. No dinheiro, a gente confirma e libera o seu acesso.</p>
     </div>`;
   document.body.appendChild(modal);
   if (window.__lenis) window.__lenis.stop();
@@ -455,32 +457,47 @@ function abrirModalPedido(e) {
   $("#pmClose").addEventListener("click", fechar);
   modal.addEventListener("click", (ev) => { if (ev.target === modal) fechar(); });
 
-  // enviar
-  $("#pmEnviar").addEventListener("click", async () => {
+  // valida os campos comuns; retorna {email, nome, fotos} ou null se inválido
+  function validarPedido() {
     const email = $("#pmEmail").value.trim();
     const nome = $("#pmNome").value.trim();
     $("#pmMsg").innerHTML = "";
-    if (!email) { $("#pmMsg").innerHTML = `<div class="pm-err">Digite seu e-mail.</div>`; return; }
+    if (!email) { $("#pmMsg").innerHTML = `<div class="pm-err">Digite seu e-mail.</div>`; return null; }
     // evento privado: só o(s) e-mail(s) permitido(s) pode(m) pedir
     if (e.venda && (e.venda.emailPermitido || e.venda.emailsPermitidos)) {
       const lista = e.venda.emailsPermitidos || [e.venda.emailPermitido];
       const permitidos = lista.map((x) => String(x).toLowerCase().trim());
       if (!permitidos.includes(email.toLowerCase())) {
         $("#pmMsg").innerHTML = `<div class="pm-err">Este é um evento privado. Use o e-mail autorizado para acessar.</div>`;
-        return;
+        return null;
       }
     }
     let fotos = [];
     if (tipo === "fotos") {
       fotos = [...selecionadas].sort((a, b) => a - b).map(String);
-      if (!fotos.length) { $("#pmMsg").innerHTML = `<div class="pm-err">Escolha pelo menos uma foto (clique ou digite os números).</div>`; return; }
+      if (!fotos.length) { $("#pmMsg").innerHTML = `<div class="pm-err">Escolha pelo menos uma foto (clique ou digite os números).</div>`; return null; }
     }
-    const btn = $("#pmEnviar");
-    btn.disabled = true; btn.textContent = "Processando…";
-    try {
-      const pedido = await window.PV_VENDA.criarPedido({ email, nome, evento: e.id, tipo, fotos });
+    return { email, nome, fotos };
+  }
 
-      // tenta gerar o link de pagamento automático (Edge Function)
+  function travarBotoes(txt) {
+    ["pmPagarOnline", "pmPagarDinheiro"].forEach((id) => {
+      const b = $("#" + id); if (b) b.disabled = true;
+    });
+    const on = $("#pmPagarOnline"); if (on) on.textContent = txt;
+  }
+  function destravarBotoes() {
+    const on = $("#pmPagarOnline"); if (on) { on.disabled = false; on.textContent = "💳 Pagar online (Pix ou cartão)"; }
+    const din = $("#pmPagarDinheiro"); if (din) { din.disabled = false; din.textContent = "💵 Paguei em dinheiro no evento"; }
+  }
+
+  // PAGAR ONLINE (InfinitePay automático)
+  $("#pmPagarOnline").addEventListener("click", async () => {
+    const v = validarPedido();
+    if (!v) return;
+    travarBotoes("Processando…");
+    try {
+      const pedido = await window.PV_VENDA.criarPedido({ email: v.email, nome: v.nome, evento: e.id, tipo, fotos: v.fotos });
       const cfg = window.PV_CONFIG || {};
       const supaUrl = cfg.SUPABASE_URL || "";
       let linkPagamento = null;
@@ -488,39 +505,32 @@ function abrirModalPedido(e) {
         try {
           const resp = await fetch(`${supaUrl}/functions/v1/criar-pagamento`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${cfg.SUPABASE_ANON_KEY || ""}`,
-            },
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.SUPABASE_ANON_KEY || ""}` },
             body: JSON.stringify({
               pedido_id: pedido.id,
               precoPack: e.venda.precoPack,
               precoFoto: e.venda.precoFoto,
-              qtdFotos: fotos.length,
+              qtdFotos: v.fotos.length,
               evento: e.id,
               titulo: e.title,
             }),
           });
           const dados = await resp.json();
           if (dados && dados.url) linkPagamento = dados.url;
-        } catch (errPag) {
-          linkPagamento = null; // função não publicada ainda → modo manual
-        }
+        } catch (errPag) { linkPagamento = null; }
       }
 
       if (linkPagamento) {
-        // pagamento automático: redireciona pro InfinitePay
         modal.querySelector(".pm-box").innerHTML = `
           <div class="pm-sucesso">
             <div class="pm-sucesso-ic">→</div>
             <h3>Indo para o pagamento…</h3>
             <p>Você será levado para a tela de pagamento segura do InfinitePay.</p>
-            <p style="margin-top:0.8rem">Assim que o pagamento for confirmado, enviamos o <strong>código de acesso</strong> para <strong>${email}</strong>. É com ele que você baixa suas fotos. 📸</p>
+            <p style="margin-top:0.8rem">Assim que o pagamento for confirmado, enviamos o <strong>código de acesso</strong> para <strong>${v.email}</strong>. É com ele que você baixa suas fotos. 📸</p>
             <p class="pm-obs">Confira a caixa de entrada e o spam. O código chega em poucos minutos.</p>
           </div>`;
         setTimeout(() => { window.location.href = linkPagamento; }, 2500);
       } else {
-        // se a função de pagamento não respondeu: registra e orienta pelo WhatsApp
         modal.querySelector(".pm-box").innerHTML = `
           <button class="pm-close" id="pmClose2">×</button>
           <div class="pm-sucesso">
@@ -533,8 +543,34 @@ function abrirModalPedido(e) {
         if (c2) c2.addEventListener("click", fechar);
       }
     } catch (err) {
-      btn.disabled = false; btn.textContent = "Enviar pedido";
+      destravarBotoes();
       $("#pmMsg").innerHTML = `<div class="pm-err">Não foi possível enviar: ${err.message}${wpp ? `<br/>Chame no WhatsApp: ${wpp}` : ""}</div>`;
+    }
+  });
+
+  // PAGUEI EM DINHEIRO (registra como pendente, aguarda liberação do admin)
+  $("#pmPagarDinheiro").addEventListener("click", async () => {
+    const v = validarPedido();
+    if (!v) return;
+    const din = $("#pmPagarDinheiro");
+    din.disabled = true; din.textContent = "Registrando…";
+    $("#pmPagarOnline").disabled = true;
+    try {
+      await window.PV_VENDA.criarPedido({ email: v.email, nome: v.nome, evento: e.id, tipo, fotos: v.fotos, pagamento: "dinheiro" });
+      modal.querySelector(".pm-box").innerHTML = `
+        <button class="pm-close" id="pmClose2">×</button>
+        <div class="pm-sucesso">
+          <div class="pm-sucesso-ic">✓</div>
+          <h3>Pedido registrado!</h3>
+          <p>Recebemos seu pedido com pagamento <strong>em dinheiro</strong>.</p>
+          <p style="margin-top:0.8rem">Assim que <strong>confirmarmos o pagamento</strong>, liberamos o seu acesso e enviamos o <strong>código</strong> para <strong>${v.email}</strong>. 📸</p>
+          <p class="pm-obs">${wpp ? `Dúvidas? Chame no WhatsApp ${wpp}.` : ""}</p>
+        </div>`;
+      const c2 = modal.querySelector("#pmClose2");
+      if (c2) c2.addEventListener("click", fechar);
+    } catch (err) {
+      destravarBotoes();
+      $("#pmMsg").innerHTML = `<div class="pm-err">Não foi possível registrar: ${err.message}${wpp ? `<br/>Chame no WhatsApp: ${wpp}` : ""}</div>`;
     }
   });
 }

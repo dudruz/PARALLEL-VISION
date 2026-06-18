@@ -743,3 +743,9 @@
   user-select: none;
   -webkit-touch-callout: none;
 }
+
+/* botões de forma de pagamento no modal */
+.pm-pagamento-label { font-size: 0.8rem; color: rgba(245,241,232,0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; text-align: center; }
+.pm-enviar + .pm-enviar { margin-top: 0.6rem; }
+.pm-dinheiro { background: transparent; color: var(--bone); border: 1px solid rgba(245,241,232,0.3); }
+.pm-dinheiro:hover { background: rgba(245,241,232,0.08); border-color: var(--amber); color: var(--amber); }

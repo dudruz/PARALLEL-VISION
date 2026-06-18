@@ -202,6 +202,10 @@
       function renderPedido(p) {
         const data = new Date(p.criado_em).toLocaleString("pt-BR");
         const fotos = p.tipo === "pack" ? "Pack completo" : `${(p.fotos||[]).length} foto(s): ${(p.fotos||[]).join(", ")}`;
+        const ehDinheiro = p.pagamento === "dinheiro";
+        const seloPag = ehDinheiro
+          ? `<span class="badge" style="background:#b5870030;color:#ffce5c;border:1px solid #ffce5c55">💵 Dinheiro — conferir</span>`
+          : `<span class="badge" style="background:#2a2a2a;color:rgba(245,241,232,.6)">💳 Online</span>`;
         const acoes = p.status === "pendente"
           ? `<div class="pedido-actions">
                <button class="btn-admin" data-libera="${p.id}">Liberar</button>
@@ -213,6 +217,7 @@
             <span class="badge ${p.status}">${p.status}</span>
           </div>
           <div class="meta">${p.nome ? p.nome + " · " : ""}Evento: <strong>${p.evento}</strong> · ${data}</div>
+          <div class="meta" style="margin-top:0.3rem">${seloPag}</div>
           ${p.codigo ? `<div class="meta">Código: <strong style="color:var(--amber)">${p.codigo}</strong></div>` : ""}
           <div class="fotos">${fotos}</div>
           ${acoes}
