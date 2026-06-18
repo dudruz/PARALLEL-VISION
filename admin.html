@@ -425,7 +425,8 @@
             if (insErr) throw insErr;
 
             // sucesso!
-            const link = `${location.origin}${location.pathname.replace(/admin\.html$/, "")}ensaio.html?id=${id}`;
+            const dir = location.pathname.replace(/[^/]*$/, ""); // pasta atual (remove o nome do arquivo)
+            const link = `${location.origin}${dir}ensaio.html?id=${id}`;
             prog.style.display = "none";
             $("#secCriar").innerHTML = `
               <div class="ce-block" style="text-align:center;padding:2.5rem">
@@ -458,7 +459,7 @@
           }
         } catch (e) { console.warn(e); }
         const ensaios = window.ENSAIOS || window.ENSAIOS_LOCAIS || {};
-        const base = location.origin + location.pathname.replace(/admin\.html$/, "");
+        const base = location.origin + location.pathname.replace(/[^/]*$/, ""); // pasta atual
 
         const itens = Object.keys(ensaios).map((id) => {
           const e = ensaios[id];
