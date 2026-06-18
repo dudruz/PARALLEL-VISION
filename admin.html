@@ -249,7 +249,7 @@
           }));
       }
 
-      // ===== GERADOR DE EVENTO (dentro do admin) =====
+      // ===== CRIAR EVENTO (salva no banco + sobe fotos) =====
       let criarMontado = false;
       function montarCriarEvento() {
         if (criarMontado) return;
@@ -266,15 +266,22 @@
               <input type="text" id="f_id" placeholder="ex: aniversario_maria" />
               <div class="hint">Gerado automático a partir do nome. Use só letras minúsculas, números e _</div>
             </div>
-            <div class="ce-row">
-              <div class="ce-field"><label>Subtítulo (data · local)</label><input type="text" id="f_sub" placeholder="Jan 2026 · Belo Horizonte" /></div>
-              <div class="ce-field"><label>Quantas fotos</label><input type="number" id="f_qtd" min="1" max="200" value="10" /></div>
-            </div>
+            <div class="ce-field"><label>Subtítulo (data · local)</label><input type="text" id="f_sub" placeholder="Jan 2026 · Belo Horizonte" /></div>
             <div class="ce-field"><label>Descrição curta</label><textarea id="f_intro" placeholder="Uma frase sobre o evento."></textarea></div>
           </div>
 
           <div class="ce-block">
-            <h3>2 · Preços</h3>
+            <h3>2 · Fotos do evento</h3>
+            <div class="ce-field">
+              <label>Selecione as fotos (originais, sem marca d'água)</label>
+              <input type="file" id="f_fotos" accept="image/*" multiple />
+              <div class="hint">A marca d'água "PARALLEL VISION" é aplicada automaticamente no site. Você sobe as originais.</div>
+            </div>
+            <div id="f_previa" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0.5rem;margin-top:0.8rem"></div>
+          </div>
+
+          <div class="ce-block">
+            <h3>3 · Preços</h3>
             <div class="ce-row">
               <div class="ce-field"><label>Foto avulsa</label><input type="text" id="f_precoFoto" value="R$ 15" /></div>
               <div class="ce-field"><label>Pack completo</label><input type="text" id="f_precoPack" value="R$ 100" /></div>
@@ -282,7 +289,7 @@
           </div>
 
           <div class="ce-block">
-            <h3>3 · Quem pode acessar</h3>
+            <h3>4 · Quem pode acessar</h3>
             <div class="ce-field">
               <label>Tipo de evento</label>
               <div class="ce-toggle">
@@ -298,30 +305,34 @@
             </div>
           </div>
 
-          <button class="ce-gerar" id="ceGerar">Gerar código do evento</button>
+          <button class="ce-gerar" id="ceSalvar">Salvar evento</button>
+          <div id="ceProgresso" style="display:none;margin-top:1rem"></div>
+          <div id="ceMsg" style="margin-top:1rem"></div>`;
 
-          <div id="ceSaida" style="display:none">
-            <div class="ce-block" style="margin-top:1.2rem">
-              <h3>✓ Código do evento</h3>
-              <p style="color:rgba(245,241,232,0.6);font-size:0.9rem;margin-bottom:1rem">Copie e cole dentro do arquivo <code style="color:var(--amber)">ensaios-data.js</code>, logo após <code style="color:var(--amber)">window.ENSAIOS = {</code></p>
-              <div class="ce-code" id="ceCodeOut"></div>
-              <button class="ce-copy" id="ceCopy">📋 Copiar código</button>
-              <div class="ce-steps">
-                <strong style="display:block;margin-bottom:0.8rem;color:var(--amber)">📸 Suba as fotos no Supabase:</strong>
-                <ol id="ceStepsOut"></ol>
-              </div>
-            </div>
-          </div>`;
-
-        // lógica do gerador
+        // lógica
         let tipoEv = "publico";
+        let arquivosSelecionados = [];
         const fId = $("#f_id"), fTitle = $("#f_title");
+
         fTitle.addEventListener("input", () => {
           if (fId.dataset.edited) return;
           fId.value = fTitle.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
         });
         fId.addEventListener("input", () => { fId.dataset.edited = "1"; });
+
+        // prévia das fotos selecionadas
+        $("#f_fotos").addEventListener("change", (ev) => {
+          arquivosSelecionados = [...ev.target.files];
+          const previa = $("#f_previa");
+          previa.innerHTML = arquivosSelecionados.map((f, i) => {
+            const url = URL.createObjectURL(f);
+            return `<div style="position:relative;aspect-ratio:2/3;border-radius:6px;overflow:hidden">
+              <img src="${url}" style="width:100%;height:100%;object-fit:cover" />
+              <span style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,.7);color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:99px">#${i+1}</span>
+            </div>`;
+          }).join("");
+        });
 
         $("#t_publico").addEventListener("click", () => setTipoEv("publico"));
         $("#t_privado").addEventListener("click", () => setTipoEv("privado"));
@@ -335,69 +346,99 @@
             : "Privado: fora da loja, só os e-mails da lista acessam (você manda o link).";
         }
 
-        $("#ceGerar").addEventListener("click", () => {
-          const id = (fId.value || "evento").trim();
-          const title = (fTitle.value || "EVENTO").trim();
-          const sub = ($("#f_sub").value || "2026 · Belo Horizonte").trim();
-          const intro = ($("#f_intro").value || "Cobertura do evento.").trim();
-          const qtd = parseInt($("#f_qtd").value, 10) || 10;
-          const precoFoto = ($("#f_precoFoto").value || "R$ 15").trim();
-          const precoPack = ($("#f_precoPack").value || "R$ 100").trim();
-          const gallery = [];
-          for (let i = 1; i <= qtd; i++) gallery.push(`"img/${id}_${i}.jpeg"`);
+        $("#ceSalvar").addEventListener("click", salvarEvento);
 
-          let vendaExtra = "";
-          if (tipoEv === "privado") {
-            const emails = ($("#f_emails").value || "").split("\n").map((x) => x.trim()).filter(Boolean);
-            const emailsStr = emails.map((e) => `"${e}"`).join(", ");
-            vendaExtra = `\n      emailsPermitidos: [${emailsStr}],  // SÓ estes e-mails acessam`;
+        async function salvarEvento() {
+          const id = (fId.value || "").trim();
+          const title = (fTitle.value || "").trim();
+          $("#ceMsg").innerHTML = "";
+
+          // validações
+          if (!id || !title) { $("#ceMsg").innerHTML = `<div class="msg err">Preencha o nome do evento.</div>`; return; }
+          if (!/^[a-z0-9_]+$/.test(id)) { $("#ceMsg").innerHTML = `<div class="msg err">O ID só pode ter letras minúsculas, números e _</div>`; return; }
+          if (!arquivosSelecionados.length) { $("#ceMsg").innerHTML = `<div class="msg err">Selecione pelo menos uma foto.</div>`; return; }
+
+          const db = window.PV_VENDA.getSupabase();
+          if (!db) { $("#ceMsg").innerHTML = `<div class="msg err">Supabase não configurado.</div>`; return; }
+
+          const btn = $("#ceSalvar");
+          btn.disabled = true; btn.textContent = "Salvando…";
+          const prog = $("#ceProgresso");
+          prog.style.display = "block";
+
+          try {
+            // 1) sobe cada foto pro bucket eventos-fotos, na pasta do evento
+            const gallery = [];
+            for (let i = 0; i < arquivosSelecionados.length; i++) {
+              const file = arquivosSelecionados[i];
+              const caminho = `${id}/foto_${i + 1}.jpeg`;
+              prog.innerHTML = `<div class="msg info">Enviando foto ${i + 1} de ${arquivosSelecionados.length}…</div>`;
+              const { error: upErr } = await db.storage
+                .from("eventos-fotos")
+                .upload(caminho, file, { upsert: true, contentType: file.type || "image/jpeg" });
+              if (upErr) throw new Error(`Erro ao subir foto ${i + 1}: ${upErr.message}`);
+              // URL pública do preview
+              const { data: pub } = db.storage.from("eventos-fotos").getPublicUrl(caminho);
+              gallery.push(pub.publicUrl);
+            }
+
+            // 2) monta o objeto do evento (mesma estrutura do ensaios-data.js)
+            const sub = ($("#f_sub").value || "2026 · Belo Horizonte").trim();
+            const intro = ($("#f_intro").value || "Cobertura do evento.").trim();
+            const precoFoto = ($("#f_precoFoto").value || "R$ 15").trim();
+            const precoPack = ($("#f_precoPack").value || "R$ 100").trim();
+            const venda = {
+              paid: true,
+              precoPack: precoPack,
+              precoFoto: precoFoto,
+              whatsapp: (window.PV_CONFIG || {}).WHATSAPP || "5531983440061",
+            };
+            if (tipoEv === "privado") {
+              const emails = ($("#f_emails").value || "").split("\n").map((x) => x.trim().toLowerCase()).filter(Boolean);
+              venda.emailsPermitidos = emails;
+            }
+            const dados = {
+              id, num: tipoEv === "privado" ? "P" : "E",
+              theme: "amber", layout: "amber",
+              title, subtitle: sub,
+              cover: gallery[0], coverMobile: gallery[0],
+              intro, body: [intro],
+              specs: {
+                camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
+                iso: "100–200", shutter: "1/320 – 1/500s",
+                flash: "Flash direto", local: "Belo Horizonte — MG", ano: "2026",
+              },
+              gallery,
+              venda,
+            };
+
+            // 3) salva no banco (tabela eventos)
+            prog.innerHTML = `<div class="msg info">Salvando o evento…</div>`;
+            const { error: insErr } = await db.from("eventos").upsert({
+              id, ordem: Date.now() % 100000, publicado: true, dados,
+            });
+            if (insErr) throw insErr;
+
+            // sucesso!
+            const link = `${location.origin}${location.pathname.replace(/admin\.html$/, "")}ensaio.html?id=${id}`;
+            prog.style.display = "none";
+            $("#secCriar").innerHTML = `
+              <div class="ce-block" style="text-align:center;padding:2.5rem">
+                <div style="width:60px;height:60px;background:rgba(0,155,58,.2);color:#4ade80;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem">✓</div>
+                <h3 style="font-size:1.5rem;margin-bottom:0.6rem">Evento criado!</h3>
+                <p style="color:rgba(245,241,232,.7);margin-bottom:1rem">"${title}" já está no ar com ${gallery.length} fotos.</p>
+                ${tipoEv === "privado"
+                  ? `<p style="color:rgba(245,241,232,.7);margin-bottom:0.5rem">Mande este link para os convidados:</p>
+                     <input type="text" readonly value="${link}" style="width:100%;background:var(--black);border:1px solid rgba(245,241,232,.2);color:var(--bone);padding:0.7rem;border-radius:6px;margin-bottom:1rem" onclick="this.select()" />`
+                  : `<p style="color:rgba(245,241,232,.7);margin-bottom:1rem">Já aparece na loja automaticamente.</p>`}
+                <button class="ce-gerar" onclick="location.reload()">Criar outro evento</button>
+              </div>`;
+          } catch (err) {
+            prog.style.display = "none";
+            btn.disabled = false; btn.textContent = "Salvar evento";
+            $("#ceMsg").innerHTML = `<div class="msg err">Não foi possível salvar: ${err.message}</div>`;
           }
-
-          const code = `  ${id}: {
-    id: "${id}",
-    num: "${tipoEv === "privado" ? "P" : "E"}",
-    theme: "amber",
-    layout: "amber",
-    title: "${title}",
-    subtitle: "${sub}",
-    cover: "img/${id}_1.jpeg",
-    intro: "${intro}",
-    body: ["${intro}"],
-    specs: {
-      camera: "Canon EOS Rebel T7", lens: "EF-S 18-55mm",
-      iso: "100–200", shutter: "1/320 – 1/500s",
-      flash: "Flash direto", local: "Belo Horizonte — MG", ano: "2026",
-    },
-    gallery: [${gallery.join(",")}],
-    venda: {
-      paid: true,
-      precoPack: "${precoPack}",
-      precoFoto: "${precoFoto}",${vendaExtra}
-      whatsapp: "5531983440061",
-    },
-  },`;
-          $("#ceCodeOut").textContent = code;
-
-          const steps = [
-            `No Supabase → Storage → bucket <code>fotos-pagas</code>, crie a pasta <code>${id}</code>`,
-            `Suba as fotos ORIGINAIS com os nomes: <code>foto_1.jpeg</code> … <code>foto_${qtd}.jpeg</code>`,
-            `Coloque os previews na pasta <code>img/</code> do site: <code>${id}_1.jpeg</code> … <code>${id}_${qtd}.jpeg</code>`,
-            `(Opcional) Suba o pack <code>${id}/pack.zip</code> no bucket`,
-            tipoEv === "privado"
-              ? `Mande o link para os convidados: <code>ensaio.html?id=${id}</code>`
-              : `Pronto! O evento já aparece na loja.`,
-          ];
-          $("#ceStepsOut").innerHTML = steps.map((s) => `<li>${s}</li>`).join("");
-          $("#ceSaida").style.display = "block";
-          $("#ceSaida").scrollIntoView({ behavior: "smooth" });
-        });
-
-        $("#ceCopy").addEventListener("click", () => {
-          navigator.clipboard.writeText($("#ceCodeOut").textContent).then(() => {
-            const b = $("#ceCopy"); b.textContent = "✓ Copiado!";
-            setTimeout(() => { b.textContent = "📋 Copiar código"; }, 2000);
-          });
-        });
+        }
       }
 
       // ===== GERADOR DE LINKS (pra mandar pros clientes) =====

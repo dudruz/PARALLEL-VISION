@@ -5,8 +5,9 @@
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 
-// troca .jpeg/.jpg por .webp (versão otimizada)
+// troca .jpeg/.jpg por .webp (versão otimizada) — só para fotos locais (img/)
 function webp(src) {
+  if (!src || /^https?:\/\//i.test(src)) return src; // URL externa (Supabase): usa como veio
   return src.replace(/\.(jpe?g|png)$/i, ".webp");
 }
 // monta <picture> com WebP + fallback original

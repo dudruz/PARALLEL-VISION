@@ -65,8 +65,11 @@ const feed = [
 const $ = (s, ctx = document) => ctx.querySelector(s);
 const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
 
-// troca .jpeg/.jpg/.png por .webp (versão otimizada)
-function webp(src) { return src.replace(/\.(jpe?g|png)$/i, ".webp"); }
+// troca .jpeg/.jpg/.png por .webp (só para fotos locais em img/)
+function webp(src) {
+  if (!src || /^https?:\/\//i.test(src)) return src;
+  return src.replace(/\.(jpe?g|png)$/i, ".webp");
+}
 
 document.documentElement.classList.add("js-reveal");
 

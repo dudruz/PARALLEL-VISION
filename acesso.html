@@ -165,24 +165,29 @@
         // Monta a lista de fotos a exibir.
         // No Supabase, as fotos seguem o padrão: evento/foto_1.jpeg, foto_2.jpeg...
         // (a posição N corresponde à ordem da galeria do evento).
+        // Detecta o tipo de evento pela galeria:
+        // - Evento NOVO (banco): gallery tem URLs https do Supabase → baixa direto da URL
+        // - Evento ANTIGO (GitHub): gallery tem "img/..." → baixa do bucket fotos-pagas (signed)
+        const ehEventoNovo = galeria.length && /^https?:\/\//i.test(galeria[0]);
+
         let itens = [];
         if (pedido.tipo === "pack") {
-          // todas as fotos da galeria
           itens = galeria.map((previewSrc, i) => ({
             preview: previewSrc,
-            arquivo: `${evento}/foto_${i + 1}.jpeg`,
+            // novo: a própria URL é o arquivo; antigo: monta caminho do bucket
+            arquivo: ehEventoNovo ? previewSrc : `${evento}/foto_${i + 1}.jpeg`,
             nome: `${evento}_foto_${i + 1}.jpeg`,
+            direto: ehEventoNovo,
           }));
         } else {
-          // só as fotos que o cliente pediu (números guardados em pedido.fotos)
           (pedido.fotos || []).forEach((ref) => {
-            // ref pode ser "5" ou "evento_5.jpeg" — extrai o número
             const n = parseInt(String(ref).replace(/\D/g, ""), 10);
             if (!n || n < 1 || n > galeria.length) return;
             itens.push({
               preview: galeria[n - 1],
-              arquivo: `${evento}/foto_${n}.jpeg`,
+              arquivo: ehEventoNovo ? galeria[n - 1] : `${evento}/foto_${n}.jpeg`,
               nome: `${evento}_foto_${n}.jpeg`,
+              direto: ehEventoNovo,
             });
           });
         }
@@ -191,18 +196,18 @@
         grid.innerHTML = itens.map((it) => `
           <figure>
             <img src="${it.preview}" alt="${it.nome}" loading="lazy" onerror="this.style.opacity=0.3" />
-            <div class="dl"><button data-foto="${it.arquivo}" data-nome="${it.nome}">⬇ Baixar</button></div>
+            <div class="dl"><button data-foto="${it.arquivo}" data-nome="${it.nome}" data-direto="${it.direto ? 1 : 0}">⬇ Baixar</button></div>
           </figure>`).join("");
         grid.querySelectorAll("[data-foto]").forEach((b) =>
-          b.addEventListener("click", () => baixar(b.dataset.foto, b.dataset.nome, b)));
+          b.addEventListener("click", () => baixar(b.dataset.foto, b.dataset.nome, b, b.dataset.direto === "1")));
       }
 
-      async function baixar(caminho, nomeArquivo, btn) {
+      async function baixar(caminho, nomeArquivo, btn, direto) {
         const txtOriginal = btn ? btn.textContent : "";
         if (btn) { btn.disabled = true; btn.textContent = "Baixando…"; }
         try {
-          const url = await window.PV_VENDA.gerarLinkDownload(caminho);
-          // baixa a imagem como blob e força o download (evita abrir em nova aba)
+          // evento novo: a URL pública já é o arquivo. antigo: gera signed URL do bucket.
+          const url = direto ? caminho : await window.PV_VENDA.gerarLinkDownload(caminho);
           const resp = await fetch(url);
           if (!resp.ok) throw new Error("falha ao buscar arquivo");
           const blob = await resp.blob();
