@@ -86,6 +86,16 @@
       if (emailQS) $("#accEmail").value = emailQS;
       if (codigoQS) $("#accCodigo").value = codigoQS;
 
+      // Se voltou do pagamento (tem email + evento, mas ainda não tem código),
+      // mostra um aviso de que o código está a caminho por e-mail.
+      if (emailQS && eventoQS && !codigoQS) {
+        $("#accMsg").innerHTML = `<div class="msg info" style="line-height:1.6">
+          <strong>Pagamento recebido! 🎉</strong><br/>
+          Estamos enviando o <strong>código de acesso</strong> para <strong>${emailQS}</strong>.
+          Confira sua caixa de entrada (e o spam) em alguns minutos, depois digite o código aqui para baixar suas fotos.
+        </div>`;
+      }
+
       // Preenche o dropdown de eventos (só os que existem nos dados).
       // Carrega do banco primeiro (com fallback pros locais).
       (async function preencherEventos() {

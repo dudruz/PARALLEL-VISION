@@ -513,10 +513,12 @@ function abrirModalPedido(e) {
         modal.querySelector(".pm-box").innerHTML = `
           <div class="pm-sucesso">
             <div class="pm-sucesso-ic">→</div>
-            <h3>Redirecionando para o pagamento…</h3>
-            <p>Você será levado para a tela de pagamento segura. Após pagar, recebe o código por e-mail automaticamente.</p>
+            <h3>Indo para o pagamento…</h3>
+            <p>Você será levado para a tela de pagamento segura do InfinitePay.</p>
+            <p style="margin-top:0.8rem">Assim que o pagamento for confirmado, enviamos o <strong>código de acesso</strong> para <strong>${email}</strong>. É com ele que você baixa suas fotos. 📸</p>
+            <p class="pm-obs">Confira a caixa de entrada e o spam. O código chega em poucos minutos.</p>
           </div>`;
-        setTimeout(() => { window.location.href = linkPagamento; }, 1500);
+        setTimeout(() => { window.location.href = linkPagamento; }, 2500);
       } else {
         // se a função de pagamento não respondeu: registra e orienta pelo WhatsApp
         modal.querySelector(".pm-box").innerHTML = `
