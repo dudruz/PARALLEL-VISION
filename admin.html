@@ -87,6 +87,7 @@
       <div class="tabs" style="margin-bottom:2rem">
         <button class="tab active" data-sec="pedidos">📋 Pedidos</button>
         <button class="tab" data-sec="criar">+ Criar evento</button>
+        <button class="tab" data-sec="links">🔗 Links</button>
       </div>
 
       <!-- SEÇÃO PEDIDOS -->
@@ -102,6 +103,9 @@
 
       <!-- SEÇÃO CRIAR EVENTO -->
       <div id="secCriar" style="display:none"></div>
+
+      <!-- SEÇÃO LINKS -->
+      <div id="secLinks" style="display:none"></div>
     </div>
 
     <!-- NÃO CONFIGURADO -->
@@ -116,6 +120,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="config.js"></script>
+    <script src="ensaios-data.js"></script>
     <script src="venda.js"></script>
     <script>
       const $ = (s) => document.querySelector(s);
@@ -166,7 +171,9 @@
           const sec = t.dataset.sec;
           $("#secPedidos").style.display = sec === "pedidos" ? "block" : "none";
           $("#secCriar").style.display = sec === "criar" ? "block" : "none";
+          $("#secLinks").style.display = sec === "links" ? "block" : "none";
           if (sec === "criar") montarCriarEvento();
+          if (sec === "links") montarLinks();
         }));
 
       // ABAS DE STATUS dos pedidos (Pendentes/Liberados/Negados)
@@ -392,6 +399,58 @@
           });
         });
       }
+
+      // ===== GERADOR DE LINKS (pra mandar pros clientes) =====
+      let linksMontado = false;
+      function montarLinks() {
+        if (linksMontado) return;
+        linksMontado = true;
+        const ensaios = window.ENSAIOS || {};
+        const base = location.origin + location.pathname.replace(/admin\.html$/, "");
+
+        const itens = Object.keys(ensaios).map((id) => {
+          const e = ensaios[id];
+          const pago = e.venda && e.venda.paid;
+          const privado = e.venda && (e.venda.emailPermitido || e.venda.emailsPermitidos);
+          const linkEvento = `${base}ensaio.html?id=${id}`;
+          const linkLoja = `${base}loja.html`;
+          let tag = "Grátis";
+          if (privado) tag = "🔒 Privado";
+          else if (pago) tag = "💰 Pago (na loja)";
+          return `
+            <div class="ce-block" style="margin-bottom:1rem">
+              <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">
+                <strong style="font-size:1rem">${e.title}</strong>
+                <span style="font-size:0.7rem;background:var(--black);padding:0.2rem 0.6rem;border-radius:999px;color:var(--amber)">${tag}</span>
+              </div>
+              <div class="ce-field" style="margin-bottom:0.5rem">
+                <label>Link do evento (mandar pro cliente)</label>
+                <div style="display:flex;gap:0.5rem">
+                  <input type="text" readonly value="${linkEvento}" id="lk_${id}" style="flex:1" />
+                  <button class="ce-copy" style="margin:0;white-space:nowrap" onclick="copiarLink('lk_${id}', this)">📋 Copiar</button>
+                </div>
+              </div>
+              ${privado ? `<div class="hint" style="color:var(--amber)">⚠️ Privado: só os e-mails autorizados conseguem comprar. Mande este link só para os convidados.</div>` : ""}
+            </div>`;
+        }).join("");
+
+        $("#secLinks").innerHTML = `
+          <div style="margin-bottom:1.5rem">
+            <p style="color:rgba(245,241,232,0.6);font-size:0.92rem">Copie o link de cada evento e mande pro cliente (WhatsApp, e-mail...). Eventos privados só abrem para os e-mails autorizados.</p>
+          </div>
+          ${itens || '<div class="ce-block">Nenhum evento ainda. Crie um na aba "Criar evento".</div>'}`;
+      }
+
+      // copiar link (precisa estar global por causa do onclick)
+      window.copiarLink = function (inputId, btn) {
+        const inp = document.getElementById(inputId);
+        if (!inp) return;
+        navigator.clipboard.writeText(inp.value).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = "✓ Copiado!";
+          setTimeout(() => { btn.textContent = orig; }, 2000);
+        });
+      };
 
       document.addEventListener("DOMContentLoaded", boot);
     </script>
