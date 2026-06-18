@@ -169,10 +169,9 @@ function buildEnsaio(e) {
           Pack completo <strong>${e.venda.precoPack || ""}</strong>
           ${e.venda.precoFoto ? ` · Foto avulsa <strong>${e.venda.precoFoto}</strong>` : ""}
         </p>
-        <p class="venda-info">Pague pelo link, depois é só pedir aqui com seu e-mail. Liberamos o acesso por ${(window.PV_CONFIG||{}).DIAS_ACESSO || 5} dias.</p>
+        <p class="venda-info">Escolha as fotos, pague com segurança e receba o acesso por e-mail. Liberamos o download por ${(window.PV_CONFIG||{}).DIAS_ACESSO || 5} dias.</p>
         <div class="venda-actions">
-          ${e.venda.linkPagamento ? `<a class="venda-btn pay" href="${e.venda.linkPagamento}" target="_blank" rel="noreferrer">Pagar agora</a>` : ""}
-          <button class="venda-btn ask" id="btnPedir">Já paguei — pedir fotos</button>
+          <button class="venda-btn ask" id="btnPedir">Pedir fotos</button>
           <a class="venda-btn ghost" href="acesso.html?evento=${e.id}" >Já tenho acesso</a>
         </div>
       </div>
@@ -510,18 +509,14 @@ function abrirModalPedido(e) {
           </div>`;
         setTimeout(() => { window.location.href = linkPagamento; }, 1500);
       } else {
-        // modo manual (link fixo ou WhatsApp): mantém o fluxo antigo
-        const linkFixo = e.venda.linkPagamento && !e.venda.linkPagamento.includes("SEU-LINK") ? e.venda.linkPagamento : null;
+        // se a função de pagamento não respondeu: registra e orienta pelo WhatsApp
         modal.querySelector(".pm-box").innerHTML = `
           <button class="pm-close" id="pmClose2">×</button>
           <div class="pm-sucesso">
             <div class="pm-sucesso-ic">✓</div>
             <h3>Pedido registrado!</h3>
-            ${linkFixo
-              ? `<p>Finalize o pagamento no link abaixo. Depois é só aguardar o código de acesso por e-mail.</p>
-                 <a href="${linkFixo}" target="_blank" class="pm-enviar" style="display:inline-block;text-decoration:none;margin-top:1rem">Pagar agora</a>`
-              : `<p>Assim que confirmarmos o pagamento, você recebe um <strong>código de acesso</strong> no e-mail <strong>${email}</strong>.</p>`}
-            <p class="pm-obs">Dúvidas? Chame no WhatsApp ${wpp}.</p>
+            <p>Tivemos um probleminha ao abrir o pagamento agora. Chame a gente no WhatsApp que finalizamos rapidinho — seu pedido já está salvo.</p>
+            <p class="pm-obs">${wpp ? `WhatsApp: ${wpp}` : ""}</p>
           </div>`;
         const c2 = modal.querySelector("#pmClose2");
         if (c2) c2.addEventListener("click", fechar);
