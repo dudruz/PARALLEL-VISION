@@ -130,6 +130,12 @@
         if ((window.PV_CONFIG||{}).SUPABASE_URL === "") {
           $("#accMsg").innerHTML = `<div class="msg info">Sistema ainda não configurado.</div>`; return;
         }
+        // GARANTE que os eventos estão carregados (senão a galeria vem vazia)
+        try {
+          if ((!window.ENSAIOS || !window.ENSAIOS[evento]) && window.PV_VENDA && window.PV_VENDA.carregarEventos) {
+            await window.PV_VENDA.carregarEventos();
+          }
+        } catch (e) { console.warn(e); }
         try {
           const res = await window.PV_VENDA.verificarAcesso(email, evento, codigo);
           if (!res.liberado) {
@@ -203,6 +209,14 @@
         }
 
         const grid = $("#galGrid");
+        if (!itens.length) {
+          // proteção: se por algum motivo as fotos não carregaram, não deixa a tela vazia
+          grid.innerHTML = `<div class="msg info" style="grid-column:1/-1">
+            Não conseguimos carregar suas fotos agora. Recarregue a página (atualize) e tente de novo.
+            Se continuar, chame no WhatsApp ${(window.PV_CONFIG||{}).WHATSAPP || ""} que a gente resolve — seu acesso está garantido.
+          </div>`;
+          return;
+        }
         grid.innerHTML = itens.map((it) => `
           <figure>
             <img src="${it.preview}" alt="${it.nome}" loading="lazy" onerror="this.style.opacity=0.3" />
