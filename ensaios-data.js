@@ -16,7 +16,7 @@ window.ENSAIOS_LOCAIS = {
     subtitle: "Copa · Brasil · festa",
     cover: "img/blayc_9.jpeg",
     coverMobile: "img/blayc_6.jpeg",
-    track: { title: "Trilha brasileira", file: "Marcelo D2- desabafo deixa eu dizer o que penso dessa vida - song lyrics (youtube).mp3" },
+    track: { title: "Trilha brasileira", file: "Marcelo%20D2-%20desabafo%20deixa%20eu%20dizer%20o%20que%20penso%20dessa%20vida%20-%20song%20lyrics%20(youtube).mp3" },
     intro:
       "A noite em que o Brasil inteiro coube numa festa. No evento Blayc, sob o tema da Copa, verde e amarelo viraram pele, festa e celebração — um registro da nossa identidade no auge da euforia.",
     body: [
@@ -86,7 +86,7 @@ window.ENSAIOS_LOCAIS = {
     title: "QUADRA",
     subtitle: "Esporte · movimento · cor",
     cover: "img/basq_3.jpeg",
-    track: { title: "Trap instrumental — vibe", file: "audio/Money Trees.mp3" },
+    track: { title: "Trap instrumental — vibe", file: "audio/Money%20Trees.mp3" },
     intro:
       "Basquete de rua sob o céu aberto. Salto e estilo na quadra do bairro — um ensaio sobre energia, atitude e a cor viva do esporte que pulsa na cidade.",
     body: [
@@ -117,7 +117,7 @@ window.ENSAIOS_LOCAIS = {
     title: "MIDNIGHT 6.0",
     subtitle: "Noite · flash direto · neon",
     cover: "img/IMG_2773.jpeg",
-    track: { title: "Night vibe", file: "audio/Matuê - OS MELHORES.mp3" },
+    track: { title: "Night vibe", file: "audio/Matuê%20-%20OS%20MELHORES.mp3" },
     intro:
       "A cidade depois que as luzes se acendem. Flash direto, neon e a textura da noite — um ensaio sobre presença e brilho no escuro, onde cada detalhe vira fonte de luz.",
     body: [
