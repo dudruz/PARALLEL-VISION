@@ -16,7 +16,7 @@ window.ENSAIOS_LOCAIS = {
     subtitle: "Copa · Brasil · festa",
     cover: "img/blayc_9.jpeg",
     coverMobile: "img/blayc_6.jpeg",
-    track: { title: "Trilha brasileira", file: "Marcelo%20D2-%20desabafo%20deixa%20eu%20dizer%20o%20que%20penso%20dessa%20vida%20-%20song%20lyrics%20(youtube).mp3" },
+    track: { title: "Trilha brasileira", file: "audio/Marcelo%20D2-%20desabafo%20deixa%20eu%20dizer%20o%20que%20penso%20dessa%20vida%20-%20song%20lyrics%20(youtube).mp3" },
     intro:
       "A noite em que o Brasil inteiro coube numa festa. No evento Blayc, sob o tema da Copa, verde e amarelo viraram pele, festa e celebração — um registro da nossa identidade no auge da euforia.",
     body: [
