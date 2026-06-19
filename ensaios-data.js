@@ -86,7 +86,7 @@ window.ENSAIOS_LOCAIS = {
     title: "QUADRA",
     subtitle: "Esporte · movimento · cor",
     cover: "img/basq_3.jpeg",
-    track: { title: "Trap instrumental — vibe", file: "" },
+    track: { title: "Trap instrumental — vibe", file: "audio/Money Trees.mp3" },
     intro:
       "Basquete de rua sob o céu aberto. Salto e estilo na quadra do bairro — um ensaio sobre energia, atitude e a cor viva do esporte que pulsa na cidade.",
     body: [
@@ -117,7 +117,7 @@ window.ENSAIOS_LOCAIS = {
     title: "MIDNIGHT 6.0",
     subtitle: "Noite · flash direto · neon",
     cover: "img/IMG_2773.jpeg",
-    track: { title: "Night vibe", file: "" },
+    track: { title: "Night vibe", file: "audio/Matuê - OS MELHORES.mp3" },
     intro:
       "A cidade depois que as luzes se acendem. Flash direto, neon e a textura da noite — um ensaio sobre presença e brilho no escuro, onde cada detalhe vira fonte de luz.",
     body: [
